@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAACH5BAUUAAEALAAAAAAQABAAAAIoTAAO" type="image/gif">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>IGL</title>
+</head>
+<body>
+    <h1>计算QLearning部分轨迹的可读性</h1>
+    <div class="grid-container" id="gridContainer">
+    </div>
+    <div id="function">
+        <p>可读性度量公式</p>
+        <p> 
+            \[
+            \lambda(\xi) = \frac{\int P(g^*|\xi_{s_0 \to s_t}) f(t) dt}{\int f(t) dt}
+            \]
+        </p>
+        <p>
+            其中:\( f(t) = T - t \) 
+            贝叶斯法则:
+            \[
+            P(g|\xi_{s_0 \rightarrow q}) \propto P(\xi_{s_0 \rightarrow q}|g) P(g)
+            \]
+        </p>
+        <p>
+            最大熵原理和轨迹成本进行建模：
+            \[P(\xi) \propto \exp(-C(\xi))\]
+            其中，\(C(\xi)\) 是轨迹\(\xi\)的成本，在此环境中通过曼哈顿距离方法计算。
+        </p>
+        <p>
+            \[ \int \exp(-C(\xi)) \approx k \exp(-C(\xi^*)) \]其中，\( \xi^* \) 是相对于成本 \( C \) 的最优轨迹。
+        </p>
+        <p>
+            以g为目标的概率值(未归一化):
+            \[ \text{UPW}(g | \xi_{s_0 \rightarrow q}) = \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi_{q \rightarrow g}^*)) P(g)}{\exp(-C(\xi_{s_0 \rightarrow g}^*))} \]
+        </p>
+        <p>
+            规范化(归一化)处理:归一化后的概率为：
+            \[
+              P(g|\xi_{s_0 \rightarrow q}) = \frac{1}{z} \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi^*_{q \rightarrow g}))}{\exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+            \]
+        </p>
+        <p>
+            离散情况下积分变求和：
+            \[
+            \lambda(\xi) = \frac{\sum_{t} P(g^*|\xi_{s_0 \to s_t}) f(t)}{\sum_{t} f(t)}
+            \]
+        </p>
+    </div>
+    <div id="calculator">
+        <p>到达每个目标的概率</p>
+        <p>\(P(g_1)\)=<span id="pg1">0.5</span></p>
+        <p>\(P(g_2)\)=<span id="pg2">0.5</span></p>
+        <p>成本\(s_0 \to s_t\):<span id="cost"></span></p>
+        <p>最优成本\(s_t \to g_1\):<span id="cost*"></span></p>
+        <p>最优成本\(s_t \to g_2\):<span id="cost2*"></span></p>
+        <p>轨迹可读性\(\lambda(s_0 \rightarrow g_1)\):<span id="legibleValue"></span></p>
+    </div>
+    <button class="btn sarsa" style="margin-top: 50px;margin-left: 30%;">开始(SARSA)</button>
+    <button class="btn qlearning" style="margin-top: 50px;">开始(Q-Learning)</button>
+    <button class="btn step" style="margin-top: 50px;">STEP</button>
+    <p style="color:rgba(255, 255, 255, 0.3); margin-left: 8%;">按F12观察控制台输出</p>
+    <!-- 音频文件 -->
+    <audio id="mySong" src="yxjh.mp3" loop></audio>
+    <p style="color:white">
+        
+      </p>
+    <script>
+    const container = document.getElementById('gridContainer');
+
+    const qIndexes=[[0,13]]
+    for (let i = 0; i < 81; i++) {
+        const gridItem = document.createElement('div');
+        gridItem.className = 'grid-item';
+        container.appendChild(gridItem);
+    if (i==9) {  
+        const childDiv = document.createElement('div');
+        childDiv.className = 'q'; // 给新的子元素添加类名 'q'
+        gridItem.appendChild(childDiv); // 将新元素添加为 grid-item 的子元素
+    }
+    if(i==4){
+        const childTargetDiv=document.createElement('div');
+        childTargetDiv.className='w';
+        gridItem.appendChild(childTargetDiv);
+    }
+    if(i==56){
+        const childAgentDiv=document.createElement('div');
+        childAgentDiv.className='q-hero';
+        gridItem.appendChild(childAgentDiv);
+    }
+    }
+    </script>
+    <script src="Maze.js" type="module"></script>
+    <script src="run_this_new.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+        </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>计算可读性</title>
+</head>
+<body>
+    <h1>计算8x8网格世界中轨迹的可读性</h1>
+    <p>计算可读性的基本公式:
+        \[
+        \lambda(\xi) = \frac{\int P(g^*|\xi_{s_0 \to s_t}) f(t) dt}{\int f(t) dt}
+        \]
+        其中$a$
+    </p>
+    <p>
+        ### B. 可读性 (Legibility)
+
+为了正式评估轨迹 $\xi$ 的可读性 $\lambda(\xi)$，我们使用了 Dragan 等人提出的可读性指标 。根据这项工作，观察者需要能够在仅观察到一部分到达目标的轨迹 $\xi_{s_0 \rightarrow s_t}$ 后，迅速推断出正确的目标 $g^*$。轨迹越可读，观察者越快能做出这一准确的推断。
+
+假设一个观察者正在观察一个代理在图1所示环境中的行为。观察者现在试图尽可能快地推断代理的目标。右侧轨迹（实线蓝线）的可读性高于左侧轨迹（虚线灰线），因为对于右侧轨迹，代理的目标更明显是右侧的目标。对于左侧轨迹，代理的下一步动作可能向左也可能向右，因此目标不明确。图2说明了在离散环境中可读性的概念。代理的目标是右侧（蓝色圆圈），左侧有一个替代目标（橙色方块）。轨迹越向右，结果的可读性越高。
+
+可读性的描述特性通过以下方程捕获 ：
+
+\[
+\lambda(\xi) = \frac{\int P(g^*|\xi_{s_0 \rightarrow s_t}) f(t) dt}{\int f(t) dt}
+\]
+
+我们积分了给定当前轨迹 $\xi_{s_0 \rightarrow s_t}$ 推断目标 $g^*$ 的概率 $P(g^*|\xi_{s_0 \rightarrow s_t})$，因此推断目标的概率越高，可读性越高。第二个要求是这种推断应该尽快发生。函数 $f(t) = T - t$ 提供了一种简单的方法，对轨迹的早期部分赋予更高的权重，我们使用 $T$ 作为轨迹的持续时间。
+
+现在我们需要计算概率 $P(g|\xi_{s_0 \rightarrow q})$，首先使用贝叶斯法则 ：
+
+\[
+P(g|\xi_{s_0 \rightarrow q}) \propto P(\xi_{s_0 \rightarrow q}|g) P(g)
+\]
+
+$P(g|\xi_{s_0 \rightarrow q})$ 是代理在目标 $g$ 的情况下遵循轨迹 $\xi_{s_0 \rightarrow q}$ 的概率。$q$ 可以是任何中间点。目标的先验概率 $P(g)$ 被假定为已知，否则可以使用均匀先验。$P(\xi_{s_0 \rightarrow q}|g)$ 可以计算为从 $s_0$ 到 $g$ 的所有经过 $\xi_{s_0 \rightarrow q}$ 的轨迹与从 $s_0$ 到 $g$ 的所有轨迹的比值 ：
+
+\[
+P(\xi_{s_0 \rightarrow q}|g) = \frac{\int_{\xi_{q \rightarrow g}} P(\xi_{s_0 \rightarrow q \rightarrow g})}{\int_{\xi_{s_0 \rightarrow g}} P(\xi_{s_0 \rightarrow g})}
+\]
+
+在此时，需要一个模型来表示观察者眼中的轨迹概率 $P(g|\xi_{s_0 \rightarrow q})$。根据最大熵原则 ，我们将此概率建模为 $P(\xi) \propto \exp(-C(\xi))$。$C(\xi)$ 是与轨迹 $\xi$ 相关的成本，因此轨迹的概率随着成本的增加而指数下降，导致 ：
+
+\[
+P(\xi_{s_0 \rightarrow q}|g) \propto \frac{\exp(-C(\xi_{s_0 \rightarrow q})) \int_{\xi_{q \rightarrow g}} \exp(-C(\xi^*_{q \rightarrow g}))}{\int_{\xi_{s_0 \rightarrow g}} \exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+\]
+
+这些积分在计算上具有挑战性，Dragan 等人推导出在假设 $C$ 是二次且其 Hessian 是常数的情况下的近似值。根据 Laplace 方法，我们有：
+
+\[
+\int \exp(-C(\xi_{s_0 \rightarrow q})) \approx k \exp(-C(\xi^*_{s_0 \rightarrow q}))
+\]
+
+其中常数 $k$ 和 $\xi^*_{s_0 \rightarrow q}$ 是相对于 $C$ 从 $s$ 到 $q$ 的最优轨迹。将该表达式代入 (7)，并使用 $z = \sum_G P(g|\xi_{s_0 \rightarrow q})$ 来归一化概率，得到 ：
+
+\[
+P(g|\xi_{s_0 \rightarrow q}) = \frac{1}{z} \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi^*_{q \rightarrow g}))}{\exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+\]
+
+我们用二次轨迹长度来近似成本 $C$，从而惩罚代理的不必要的长路径 ：
+
+\[
+C = \sum_t \|\xi_{s_0 \rightarrow s_{t+1}} - \xi_{s_0 \rightarrow s_t}\|^2
+\]
+
+对于步长为 1 的离散情况，$C$ 等价于曼哈顿距离。在多目标情况下，代理可以使轨迹越来越可读，而在增加相对于 $C$ 的成本时永远不会达到 1 的得分。为了防止代理远离观察者的预期，Dragan 等人建议使用正则项 ：
+
+\[
+L(\xi) = \lambda(\xi) - \mu C(\xi)
+\]
+
+我们没有应用这个正则项，因为环境已经对较长的轨迹进行了惩罚。Dragan 等人的实验证明，对于可读轨迹，参与者能够更快、更准确地推断目标 。
+    </p>
+    <p>
+        ### C. 观察者建模 (Modeling the Observer)
+
+我们比较了四种算法：Q-Learning (Q-L)、Q-OBS-D、Q-OBS-P 和 Q-OBS-L。这些算法在观察者 \( \hat{O} \) 实现的策略上有所不同。表I展示了所用的 \( \hat{O} \) 函数的概述。这些算法的不同之处在于 \( \hat{O} \) 的选择，这些选择插入到公式 (2) 中。主要区别在于 Q-Learning 作为基线算法被认为是非交互的，而其他三种算法被认为是交互的。实现不同版本的交互方法的主要目的是探索如何在交互强化学习中集成一个能够推断代理可能目标的观察者。在下文中，我们将解释所提出的算法。
+
+1) Q-L: 使用平凡的 \( \hat{O} \) 方程：
+
+\[
+\hat{O} = 0
+\]
+
+这相当于简单的 Q-Learning。Q-Learning 不使用任何来自观察者的信息，因此它是非交互的。由于 Q-Learning 只考虑来自环境的奖励，因此它对可读性没有信息。然而，这并不意味着学到的轨迹不可读，我们可以预期某些轨迹比其他轨迹更可读。因此，Q-Learning 将作为基线来比较，仅靠机会学到的轨迹的可读性。
+
+2) Q-OBS-D:
+
+\[
+\hat{O}(s, a, s') = \frac{1}{z} \exp(-\sigma d(s', g^*))
+\]
+
+其中 \( d \) 是从 \( s' \) 到目标的曼哈顿距离。\( z \) 是 softmax 分布的分区函数，用于将概率归一化为1。\( \sigma \) 是调整分布峰值“尖锐度”的温度参数。公式 (10) 仅依赖于当前状态 \( s' \) 而不是观察到的轨迹片段。我们认为这种方法是估计目标概率的简单方法，并期望它在某些情况下有效，因为它激励代理尽早减少到目标的距离。然而，在更复杂的配置中，例如当目标在另一个目标后面时，这种方法可能无效。因此，我们期望它至少与 Q-L 一样好，并且在某些情况下甚至更好。
+
+3) Q-OBS-P: 对于 Q-OBS-P，我们使用公式 (8) 中给出的基于轨迹片段的目标概率：
+
+\[
+\hat{O}(\xi_{s_0 \rightarrow q}) = P(g^*|\xi_{s_0 \rightarrow q})
+\]
+
+由于这种方法使用了一种在之前研究中成功应用的目标概率方法，它比 Q-OBS-D 更适合作为目标概率的估计，我们期望它表现更好。
+
+4) Q-OBS-L: 我们直接使用观察者反馈的可读性。对于离散情况，步数为 \( K \)，从 \( s_0 \) 到 \( q \) 的状态为 \( s_k \)，公式 (3) 变为：
+
+\[
+\hat{O}(\xi_{s_0 \rightarrow q}) = \frac{\sum_{k=0}^{K} P(g|\xi_{s_0 \rightarrow s_k}) f(k)}{\sum_{k}^{K} f(k)}
+\]
+
+直接使用可读性并不是目标概率，因为它对所有目标的和并不为一，然而它本质上包含了观察者对代理目标的信心信息。因此，我们也期望这种方法比 Q-OBS-D 表现更好。
+    </p>
+    <p>
+        为了计算给定轨迹的可读性，我们需要按照上面的理论步骤逐一进行计算。具体步骤包括：
+
+1. **计算轨迹每个部分的概率 $P(g|\xi_{s_0 \rightarrow q})$**。
+2. **计算整个轨迹的可读性 $\lambda(\xi)$**。
+
+### 步骤1：计算每个部分的概率 $P(g|\xi_{s_0 \rightarrow q})$
+
+根据贝叶斯法则，$P(g|\xi_{s_0 \rightarrow q})$ 可以表示为：
+
+\[
+P(g|\xi_{s_0 \rightarrow q}) \propto P(\xi_{s_0 \rightarrow q}|g) P(g)
+\]
+
+我们先计算 $P(\xi_{s_0 \rightarrow q}|g)$。假设轨迹的成本 $C(\xi)$ 是二次的轨迹长度，即：
+
+\[
+C = \sum_t \|\xi_{s_0 \rightarrow s_{t+1}} - \xi_{s_0 \rightarrow s_t}\|^2
+\]
+
+给定轨迹为：
+
+\[(6,2) \rightarrow (6,3) \rightarrow (6,4) \rightarrow (5,4) \rightarrow (4,4) \rightarrow (3,4) \rightarrow (2,4) \rightarrow (1,4) \rightarrow (0,4)\]
+
+计算各段的成本：
+
+- 从 (6,2) 到 (6,3)：$\| (6,3) - (6,2) \|^2 = 1$
+- 从 (6,3) 到 (6,4)：$\| (6,4) - (6,3) \|^2 = 1$
+- 从 (6,4) 到 (5,4)：$\| (5,4) - (6,4) \|^2 = 1$
+- 从 (5,4) 到 (4,4)：$\| (4,4) - (5,4) \|^2 = 1$
+- 从 (4,4) 到 (3,4)：$\| (3,4) - (4,4) \|^2 = 1$
+- 从 (3,4) 到 (2,4)：$\| (2,4) - (3,4) \|^2 = 1$
+- 从 (2,4) 到 (1,4)：$\| (1,4) - (2,4) \|^2 = 1$
+- 从 (1,4) 到 (0,4)：$\| (0,4) - (1,4) \|^2 = 1$
+
+总成本 $C(\xi_{s_0 \rightarrow q}) = 8$。
+
+计算每一步的概率：
+
+\[
+P(\xi_{s_0 \rightarrow q}|g) \propto \exp(-C(\xi_{s_0 \rightarrow q}))
+\]
+
+真实目标 $g^*$ 在 (0,4)，干扰目标 $g_{alt}$ 在 (1,0)。
+
+假设 $P(g)$ 为均匀分布，即 $P(g^*) = P(g_{alt}) = 0.5$。
+
+计算从 $s_0$ 到每一步的概率：
+
+\[
+P(\xi_{s_0 \rightarrow q}|g^*) = \exp(-8)
+\]
+\[
+P(\xi_{s_0 \rightarrow q}|g_{alt}) = \exp(-C_{alt})
+\]
+
+其中 $C_{alt}$ 是到干扰目标的轨迹成本。假设干扰目标轨迹也为直线，成本为：
+
+从 (6,2) 到 (1,0) 的曼哈顿距离：$|6-1| + |2-0| = 7+2 = 9$。
+
+\[
+P(\xi_{s_0 \rightarrow q}|g_{alt}) = \exp(-9)
+\]
+
+概率比为：
+
+\[
+P(g^*|\xi_{s_0 \rightarrow q}) = \frac{P(\xi_{s_0 \rightarrow q}|g^*) P(g^*)}{P(\xi_{s_0 \rightarrow q}|g^*) P(g^*) + P(\xi_{s_0 \rightarrow q}|g_{alt}) P(g_{alt})}
+\]
+
+带入数值：
+
+\[
+P(g^*|\xi_{s_0 \rightarrow q}) = \frac{\exp(-8) \cdot 0.5}{\exp(-8) \cdot 0.5 + \exp(-9) \cdot 0.5} = \frac{\exp(-8)}{\exp(-8) + \exp(-9)} = \frac{1}{1 + \exp(-1)}
+\]
+
+计算：
+
+\[
+P(g^*|\xi_{s_0 \rightarrow q}) \approx \frac{1}{1 + 0.3679} \approx \frac{1}{1.3679} \approx 0.7311
+\]
+
+### 步骤2：计算整个轨迹的可读性 $\lambda(\xi)$
+
+使用函数 $f(t) = T - t$ 来对早期部分赋予更高权重，轨迹的持续时间 $T = 8$。积分公式：
+
+\[
+\lambda(\xi) = \frac{\int_0^T P(g^*|\xi_{s_0 \rightarrow s_t}) (T - t) dt}{\int_0^T (T - t) dt}
+\]
+
+假设 $P(g^*|\xi_{s_0 \rightarrow s_t})$ 随时间变化不大，积分可简化为：
+
+\[
+\lambda(\xi) = \frac{P(g^*|\xi_{s_0 \rightarrow s_t}) \int_0^T (T - t) dt}{\int_0^T (T - t) dt}
+\]
+
+其中，$\int_0^T (T - t) dt = \frac{T^2}{2} = \frac{8^2}{2} = 32$。
+
+可读性 $\lambda(\xi)$ 近似为：
+
+\[
+\lambda(\xi) \approx 0.7311
+\]
+
+### 结论
+
+给定轨迹的可读性 $\lambda(\xi) \approx 0.7311$。
+    </p>
+    <p>
+        在离散情况下，将积分转换为求和后，公式会有一些调整。以下是如何进行这些调整的详细过程。
+
+1. **可读性度量公式**：
+   \[
+   \lambda(\xi) = \frac{\sum_{t} P(g^*|\xi_{s_0 \to s_t}) f(t)}{\sum_{t} f(t)}
+   \]
+
+2. **贝叶斯法则**：
+   \[
+   P(g|\xi_{s_0 \rightarrow q}) \propto P(\xi_{s_0 \rightarrow q}|g) P(g)
+   \]
+
+3. **最大熵原理和轨迹成本建模**：
+   \[
+   P(\xi) \propto \exp(-C(\xi))
+   \]
+   其中，\(C(\xi)\) 是轨迹 \(\xi\) 的成本，使用曼哈顿距离计算。
+
+4. **最优轨迹近似**：
+   \[
+   \sum_{\xi} \exp(-C(\xi)) \approx k \exp(-C(\xi^*))
+   \]
+   其中，\( \xi^* \) 是相对于成本 \( C \) 的最优轨迹。
+
+5. **未归一化的概率**：
+   \[
+   \text{UPW}(g | \xi_{s_0 \rightarrow q}) = \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi_{q \rightarrow g}^*)) P(g)}{\exp(-C(\xi_{s_0 \rightarrow g}^*))}
+   \]
+
+6. **归一化后的概率**：
+   \[
+   P(g|\xi_{s_0 \rightarrow q}) = \frac{1}{Z} \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi^*_{q \rightarrow g}))}{\exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+   \]
+
+在上述公式中，离散情况下积分变成求和：
+
+- 原始公式中的积分 \(\int f(t) dt\) 变为求和 \(\sum_{t} f(t)\)。
+- 轨迹 \(\xi\) 的可能性积分 \(\int \exp(-C(\xi))\) 变为求和 \(\sum_{\xi} \exp(-C(\xi))\)。
+
+### 离散情况下的整体公式
+
+可读性度量公式：
+\[
+\lambda(\xi) = \frac{\sum_{t} P(g^*|\xi_{s_0 \to s_t}) f(t)}{\sum_{t} f(t)}
+\]
+其中 \( f(t) = T - t \)。
+
+贝叶斯法则：
+\[
+P(g|\xi_{s_0 \rightarrow q}) \propto P(\xi_{s_0 \rightarrow q}|g) P(g)
+\]
+
+最大熵原理和轨迹成本：
+\[
+P(\xi) \propto \exp(-C(\xi))
+\]
+其中 \(C(\xi)\) 是轨迹 \(\xi\) 的成本。
+
+最优轨迹近似：
+\[
+\sum_{\xi} \exp(-C(\xi)) \approx k \exp(-C(\xi^*))
+\]
+
+未归一化的概率值：
+\[
+\text{UPW}(g | \xi_{s_0 \rightarrow q}) = \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi_{q \rightarrow g}^*)) P(g)}{\exp(-C(\xi_{s_0 \rightarrow g}^*))}
+\]
+
+归一化后的概率：
+\[
+P(g|\xi_{s_0 \rightarrow q}) = \frac{1}{Z} \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi^*_{q \rightarrow g}))}{\exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+\]
+
+其中，归一化常数 \(Z\) 是所有可能轨迹的总和：
+\[
+Z = \sum_{g} \frac{\exp(-C(\xi_{s_0 \rightarrow q}) - C(\xi^*_{q \rightarrow g}))}{\exp(-C(\xi^*_{s_0 \rightarrow g}))} P(g)
+\]
+    </p>
+</body>
+</html>

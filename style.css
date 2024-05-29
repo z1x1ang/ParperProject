@@ -1,0 +1,108 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    /* background-color:  rgb(19,36,23); */
+    background-color: black;
+}
+h1{
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: white;
+}
+#function{
+    color: white;
+    position: absolute;
+    top:5px;
+    left:1%;
+    width: 26%;
+}
+#calculator{
+    position: absolute;
+    top:50px;
+    right:9%;
+    color:white;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    /* 47 */
+    width: 470px;
+    height: 470px;
+    margin: 0px auto;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.grid-item {
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    position: relative;
+    
+}
+
+.q, .q-hero,.q-hero2 {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    z-index: 1;
+    background-color: black;
+}
+
+.q-hero,.q-hero2 {
+    position: absolute;
+    background-color: red;
+    z-index: 3; /* 确保它覆盖在 .q 上 */
+    background-image: url(tqm.jpg);
+    background-size: cover; /* 使背景图片铺满整个元素 */
+    background-position: center; /* 背景图片居中 */
+}
+
+.w {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid black;
+    background-color: yellow;
+    background-size: cover; /* 使背景图片铺满整个元素 */
+    background-position: center; /* 背景图片居中 */
+}
+
+.btn {
+    background: #3498db;
+    background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+    background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+    background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+    background-image: -o-linear-gradient(top, #3498db, #2980b9);
+    background-image: linear-gradient(to bottom, #3498db, #2980b9);
+    -webkit-border-radius: 11;
+    -moz-border-radius: 11;
+    border-radius: 11px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 20px;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+  }
+  
+  .btn:hover {
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
+  }
+
+  /* Horizontal line */
+  .line {
+    position: absolute;
+    border-top: 3px solid black; /* Thick line for visibility */
+    z-index: 1; /* Ensure it's above the cell background */
+  }

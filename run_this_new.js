@@ -232,14 +232,9 @@ function main() {
 // 确保DOM完全加载后再运行主函数
 document.addEventListener('DOMContentLoaded', function() {
     // 选择按钮
-    const sarsaButton = document.querySelector('.sarsa');
     const qlearningButton = document.querySelector('.qlearning');    
     const stepButton=document.querySelector('.step')
-    // 为SARSA按钮添加点击事件监听器
-    sarsaButton.addEventListener('click', function() {
-        METHOD = "SARSA";
-        main(); // 调用main函数启动SARSA
-    });
+
     // 为Q-Learning按钮添加点击事件监听器
     qlearningButton.addEventListener('click', function() {
         METHOD = "Q-Learning";

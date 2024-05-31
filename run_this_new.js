@@ -6,8 +6,9 @@ let METHOD;
 const gridItems = document.querySelectorAll('.grid-item');
 //获得cost元素
 const cost=document.getElementById('cost');
+
 //成本初始为0
-let C=1
+let C=0
 
 let legiable_f1=0
 //定义去每个目标的概率
@@ -19,14 +20,16 @@ let i=0;
 async function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-    //数值向坐标转换
-    function getCoordinates(n) {
+//数值向坐标转换
+function getCoordinates(n) {
         return [Math.floor(n / 9), n % 9];
-    }
+}
 
 //softmax规范化，将数值转换成概率
+//cost智能体的行动成本 minCost到真实目标g1的最优成本，minCost到真实目标g2的最优成本
 function updateProbability(cost,minCost,minCost2){
 let f2=Math.exp(-cost-minCost)*probability_g1/8+Math.exp(-cost-minCost2)*probability_g2/7;
+//计算去每个目标的概率
 probability_g1=Math.exp(-cost-minCost)*probability_g1/8;
 probability_g2=Math.exp(-cost-minCost2)*probability_g2/7;
 console.log(probability_g1);
@@ -34,9 +37,15 @@ console.log(probability_g2);
 //归一化 
 probability_g1=probability_g1/f2;
 probability_g2=probability_g2/f2;
+//更新GUI
+document.getElementById("pg1").innerText=probability_g1;
+document.getElementById("pg2").innerText=probability_g2;
 //计算可读性 分子
 legiable_f1+=probability_g1*(8-cost);
-//let legiable=probability_g1*(8-cost)/36
+//36等于总的时间步长8+7+...+1=36
+let legiable=legiable_f1/36;
+//更新GUI
+document.getElementById("legibleValue").innerText=legiable;
 console.log(legiable_f1/36);
 }
 
@@ -58,11 +67,12 @@ console.log(legiable_f1/36);
     // }
     
 function step(q_table){
-    //每步更新成本
-    cost.textContent=C++;
+    //每步更新成本，C被初始化为0
+    cost.textContent=++C;
     //算最优动作
     let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.newDiv));
     let max=Math.max(...q_table[currentIndex]);
+    //假设按这个路径走
     let indices=[3,3,0,0,0,0,0,0];
     // q_table[currentIndex].forEach((value,index)=>{
     //     if(max==value){indices.push(index);}
@@ -70,7 +80,7 @@ function step(q_table){
     // let rad=Math.floor(Math.random()*indices.length);
     //移动，更新GUI
     let s_=env.step(indices[i++],false);
-    console.log("nnn"+getCoordinates(s_));
+    console.log(getCoordinates(s_));
     document.getElementById('cost*').textContent=getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4);
     document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1];
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
@@ -225,14 +235,9 @@ function main() {
 // 确保DOM完全加载后再运行主函数
 document.addEventListener('DOMContentLoaded', function() {
     // 选择按钮
-    const sarsaButton = document.querySelector('.sarsa');
     const qlearningButton = document.querySelector('.qlearning');    
     const stepButton=document.querySelector('.step')
-    // 为SARSA按钮添加点击事件监听器
-    sarsaButton.addEventListener('click', function() {
-        METHOD = "SARSA";
-        main(); // 调用main函数启动SARSA
-    });
+
     // 为Q-Learning按钮添加点击事件监听器
     qlearningButton.addEventListener('click', function() {
         METHOD = "Q-Learning";

@@ -45,7 +45,7 @@ class RL{
     //线性递减
     // updateEpsilon(currentEpisode) {
     //     //线性递减epsilon
-    //     const initialEpsilon = this.epsilon; // 初始epsilon值
+    //     const initialEpsilon = this.epsilon; // 初始epsilon值0.9
     //     const minEpsilon = 0.01; // epsilon的最小值
     //     const decayRate = (initialEpsilon - minEpsilon) / 100; // 计算递减率
     //     this.epsilon = Math.max(0.1, initialEpsilon - decayRate * currentEpisode); // 更新epsilon值，确保不小于最小值

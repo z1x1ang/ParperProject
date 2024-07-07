@@ -15,7 +15,7 @@ let C=0
 let probability_g1,probability_g2;
 
 //假设按这个路径走
-let indices=[3,3,3,3,0,0,0,0,0,0,2,2];
+let indices=[2,2,0,0,0,0,0,0,3,3,3,3];
 
 //定义总的时间步长
 let T=indices.length;
@@ -23,7 +23,7 @@ let legiable_f1=0.5*T;
 let legiable_f2=T;
 
 //定义初始可读性
-let legibility=0.5;
+let legibility=legiable_f1/legiable_f2;
 //定义初始动作下标
 let i=0;
 
@@ -56,10 +56,10 @@ legiable_f1+=probability_g1*(T-cost);
 legiable_f2+=T-cost;
 //36等于总的时间步长12+11+8+7+...+1=78
 console.log("lll"+legiable_f1);
-legibility=legiable_f1/36;
+legibility=legiable_f1/legiable_f2;
 //更新GUI
 document.getElementById("legibleValue").innerText=legibility;
-console.log(legiable_f1/36);
+console.log(legiable_f1/legiable_f2);
 }
 
     // function get_policy(q_table) {

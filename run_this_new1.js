@@ -98,7 +98,7 @@ function step(q_table){
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
 }
 async function update(){
-    for(let episode=0;episode<120;episode++){
+    for(let episode=0;episode<1200;episode++){
         //初始化装态
         let observation=env.reset()
         let c=0;

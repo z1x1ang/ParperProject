@@ -5,23 +5,35 @@ class RL{
         this.gamma=reward_decay;
         this.epsilon=e_greedy;
         this.q_table={};//Q表用对象表示
+        for (let state = 0; state <= 80; state++) {
+            this.q_table[state] = Array.from({length: this.actions.length}, () => Math.random() * 2);
+        }
+        // 在循环外更改状态4的键为'terminal'
+        this.q_table['terminal'] = this.q_table[4];
+        delete this.q_table[4];
         this.i=0;
+        //test
+        this.actionArray=[0,0,0,0,0,0,3,3];
+        //设置随机种子
+        this.random=new Math.seedrandom('100')
     }
 
     checkStateExist(state)
     {
         if(!this.q_table[state]){
         // 如果当前状态在Q表中不存在，将其加入Q表并为每个动作初始化一个0到2之间的随机值
-        this.q_table[state]=Array.from({length:this.actions.length},() => Math.random() * 2);
-        console.log(this.q_table[state]);
+        this.q_table[state]=Array.from({length:this.actions.length},() => this.random() * 2);
+        //this.q_table[state]=Array.from({length:this.actions.length},() => this.random() * 0);
+        
+
         }
     }
     //observation 某个状态state，0,1,2,3
     chooseAction(observation) {
         this.checkStateExist(observation); // 确保状态存在
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
-        
-        if (Math.random() < this.epsilon) {
+       // return this.actionArray[this.i++]
+        if (this.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             const stateActionValues = this.q_table[observation];
             // 找出最大值
@@ -34,11 +46,11 @@ class RL{
                 return indexes;
             }, []);
         // 从最大值索引中随机选择一个
-        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
+        const randomIndex = maxIndexes[Math.floor(this.random() * maxIndexes.length)];
         return this.actions[randomIndex]; // 根据最大价值随机选择动作
         } else {
             // 随机选择动作
-            const randomIndex = Math.floor(Math.random() * this.actions.length);
+            const randomIndex = Math.floor(this.random() * this.actions.length);
             return this.actions[randomIndex];
         }
     }

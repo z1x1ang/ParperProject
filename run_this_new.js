@@ -14,16 +14,7 @@ let C=0
 //定义去每个目标的概率
 let probability_g1,probability_g2;
 
-//假设按这个路径走
-let indices=[2,2,0,0,0,0,0,0,3,3,3,3];
 
-//定义总的时间步长
-let T=indices.length;
-let legiable_f1=0.5*T;
-let legiable_f2=T;
-
-//定义初始可读性
-let legibility=legiable_f1/legiable_f2;
 //定义初始动作下标
 let i=0;
 
@@ -42,67 +33,76 @@ let f2=Math.exp(-cost-minCost)*0.5/Math.exp(-8)+Math.exp(-cost-minCost2)*0.5/Mat
 //计算去每个目标的概率
 probability_g1=Math.exp(-cost-minCost)*0.5/Math.exp(-8);
 probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
-console.log(probability_g1);
-console.log(probability_g2);
+//console.log(probability_g1);
+//console.log(probability_g2);
 //归一化 
 probability_g1=probability_g1/f2;
 probability_g2=probability_g2/f2;
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
+
 //计算可读性 分子
-legiable_f1+=probability_g1*(T-cost);
+//legiable_f1+=probability_g1*(T-cost);
 //计算可读性分母
-legiable_f2+=T-cost;
+//legiable_f2+=T-cost;
 //36等于总的时间步长12+11+8+7+...+1=78
-console.log("lll"+legiable_f1);
-legibility=legiable_f1/legiable_f2;
+//console.log("lll"+legiable_f1);
+//legibility=legiable_f1/legiable_f2;
 //更新GUI
-document.getElementById("legibleValue").innerText=legibility;
-console.log(legiable_f1/legiable_f2);
+//document.getElementById("legibleValue").innerText=legibility;
+//console.log(legiable_f1/legiable_f2);
 }
 
-    // function get_policy(q_table) {
-    //     const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
+    function get_policy(q_table) {
+      
+        const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
     
-    //     Object.entries(q_table).forEach(([key, row]) => {
-    //         if (key === 'terminal'||key==9) return; // 跳过terminal属性和无效的key
-    //         const maxVal = Math.max(...row);
-    //         const indices = row.reduce((indices, val, index) => {
-    //             return val === maxVal ? indices.concat(index) : indices;
-    //         }, []);
-    //         // 收集所有最大值对应的方向符号
-    //         let symbolsToShow = indices.map(index => directionSymbols[index]).join('');
-    //         // 设置收集到的符号到对应的gridItem
-    //         gridItems[key].textContent = symbolsToShow;
-    //         // console.log(`第${key}行最大下标分别是${indices}`);
-    //     });  
-    // }
+        Object.entries(q_table).forEach(([key, row]) => {
+            if (key === 'terminal'||key==9) return; // 跳过terminal属性和无效的key
+            const maxVal = Math.max(...row);
+            const indices = row.reduce((indices, val, index) => {
+                return val === maxVal ? indices.concat(index) : indices;
+            }, []);
+            // 收集所有最大值对应的方向符号
+            let symbolsToShow = indices.map(index => directionSymbols[index]).join('');
+            // 设置收集到的符号到对应的gridItem
+            gridItems[key].textContent = symbolsToShow;
+            // console.log(`第${key}行最大下标分别是${indices}`);
+        });  
+    }
     
-function step(q_table){
+function step(s_){
     //每步更新成本，C被初始化为0
     cost.textContent=++C;
     //算最优动作
-    let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.newDiv));
-    let max=Math.max(...q_table[currentIndex]);
-  
+    //let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.newDiv));
+    //let max=Math.max(...q_table[currentIndex]);
+
     // q_table[currentIndex].forEach((value,index)=>{
     //     if(max==value){indices.push(index);}
     // })
     // let rad=Math.floor(Math.random()*indices.length);
     //移动，更新GUI
-    let s_=env.step(indices[i++],false);
-    console.log(getCoordinates(s_));
+    
+    //console.log(getCoordinates(s_));
+    if(s_=='terminal'){
+        s_=4
+        //console.log("long"+typeof(s_));
+    }
+    else s_=parseInt(s_)
     document.getElementById('cost*').textContent=getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4);
     document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1];
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
 }
 async function update(){
     for(let episode=0;episode<120;episode++){
+   
         //初始化装态
         let observation=env.reset()
         let c=0;
         let tmp_policy={}
+
         while(true){
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
@@ -110,7 +110,17 @@ async function update(){
             tmp_policy[state_item]=action
             //采取行为获得下一个状态和回报，以及是否终止
             let {s_:observation_,reward,done,oval_flag}=env.step(action)
-            // await delay(50);  // 延时50毫秒    
+            if(observation_!=state_item){
+            step(observation_);
+            if(isNaN(probability_g1)){
+                console.log("dc");
+                console.log("e是"+episode);
+                console.log("c是738"+c);
+                }
+            reward=reward+probability_g1*0.12;
+        }
+            if(episode==3){
+            await delay(50);}  // 延时50毫秒    
             if(METHOD=="SARSA"){
                 //基于下一个状态选择行为
                 let action_=RL.chooseAction(observation_)
@@ -119,26 +129,34 @@ async function update(){
             }
             else if(METHOD=="Q-Learning"){
                 //根据当前变化更新Q
+                console.log("ob是"+observation_);
                 RL.learn(observation,action,reward,observation_)
             }
             //改变状态和行为
             observation=observation_;
             c+=1;
+            
+            if(episode==1&&c==737){
+                console.log("tb");
+            } 
             //RL.updateEpsilon(episode);
             //如果为终止状态，结束当前的局数
-            if(done) break;
+            if(done) {
+                C=0;
+                break;}
         }
     }
     env.reset();
     console.log("120局游戏结束");
+   
     //输出最终Q表
     let q_table_result=RL.q_table;
     //绘制相关箭头
-    console.log(q_table_result); // 打印出q_table看看是什么
-    //get_policy(q_table_result);
+    //console.log(q_table_result); // 打印出q_table看看是什么
+    get_policy(q_table_result);
     //test(q_table_result);
     //policy?console.log("最优策略已收敛:",policy):console.log("最优策略未收敛");
-    console.table(q_table_result);
+    //console.table(q_table_result);
 }
 
 function test(q_table){
@@ -154,7 +172,7 @@ function test(q_table){
              // ε-greedy 策略选择动作
             const stateActionValues = q_table[observation];
             //打印observation
-            console.log(observation);
+            //console.log(observation);
             // 找出最大值
             const maxValue = Math.max(...stateActionValues);
             // 找出所有最大值的索引

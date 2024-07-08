@@ -30,6 +30,8 @@ this.visited = new Array(this.gridItems.length).fill(false);
 }
 reset(){
    this.gridItems[56].appendChild(this.newDiv);
+   //重置visited数组全为0
+   this.visited.fill(false);
    //返回起点位置
    return 56;
 }
@@ -68,7 +70,7 @@ step(action,returnValue=true){
  //移动到新位置
  this.gridItems[newIndex].appendChild(this.newDiv);
  let s_ = newIndex; // 移动后的新状态
-if(!returnValue){
+ if(!returnValue){
     return s_;
 }
 

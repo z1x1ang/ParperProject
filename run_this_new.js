@@ -35,9 +35,9 @@ probability_g1=Math.exp(-cost-minCost)*0.5/Math.exp(-8);
 probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //console.log(probability_g1);
 //console.log(probability_g2);
-//归一化 
-probability_g1=probability_g1/f2;
-probability_g2=probability_g2/f2;
+//归一化 1e-18
+probability_g1=probability_g1/(f2);
+probability_g2=probability_g2/(f2);
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
@@ -96,20 +96,22 @@ function step(s_){
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
 }
 async function update(){
+    console.table(RL.q_table);
     for(let episode=0;episode<120;episode++){
-   
         //初始化装态
         let observation=env.reset()
         let c=0;
         let tmp_policy={}
-
         while(true){
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
+            console.log("选择的行为"+action);
             let state_item=observation
+            console.log("当前的状态"+state_item);
             tmp_policy[state_item]=action
             //采取行为获得下一个状态和回报，以及是否终止
             let {s_:observation_,reward,done,oval_flag}=env.step(action)
+            console.log("获得的奖励"+reward);
             if(observation_!=state_item){
             step(observation_);
             if(isNaN(probability_g1)){
@@ -117,10 +119,10 @@ async function update(){
                 console.log("e是"+episode);
                 console.log("c是738"+c);
                 }
-            reward=reward+probability_g1*0.12;
+            reward=reward+probability_g1*0.28;
+            console.log("重塑后的奖励"+reward)
         }
-            if(episode==3){
-            await delay(50);}  // 延时50毫秒    
+            await delay(50);  // 延时50毫秒    
             if(METHOD=="SARSA"){
                 //基于下一个状态选择行为
                 let action_=RL.chooseAction(observation_)
@@ -129,22 +131,20 @@ async function update(){
             }
             else if(METHOD=="Q-Learning"){
                 //根据当前变化更新Q
-                console.log("ob是"+observation_);
                 RL.learn(observation,action,reward,observation_)
             }
             //改变状态和行为
             observation=observation_;
             c+=1;
-            
-            if(episode==1&&c==737){
-                console.log("tb");
-            } 
+       
             //RL.updateEpsilon(episode);
             //如果为终止状态，结束当前的局数
             if(done) {
                 C=0;
-                break;}
+                break;
+            }
         }
+     break;
     }
     env.reset();
     console.log("120局游戏结束");

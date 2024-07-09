@@ -15,7 +15,7 @@ let C=0
 let probability_g1,probability_g2;
 
 //假设按这个路径走
-let indices=[2,2,0,0,0,0,0,0,3,3,3,3];
+let indices=[3,1,3,3,3,3,3,0,0,0,0,0,2,0,0,2,2,2];
 
 //定义总的时间步长
 let T=indices.length;

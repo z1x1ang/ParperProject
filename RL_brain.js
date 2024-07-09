@@ -15,17 +15,14 @@ class RL{
         //test
         this.actionArray=[0,0,0,0,0,0,3,3];
         //设置随机种子
-        this.random=new Math.seedrandom('100')
+        this.random=new Math.seedrandom('2024')
     }
-
     checkStateExist(state)
     {
         if(!this.q_table[state]){
         // 如果当前状态在Q表中不存在，将其加入Q表并为每个动作初始化一个0到2之间的随机值
         this.q_table[state]=Array.from({length:this.actions.length},() => this.random() * 2);
         //this.q_table[state]=Array.from({length:this.actions.length},() => this.random() * 0);
-        
-
         }
     }
     //observation 某个状态state，0,1,2,3
@@ -70,12 +67,13 @@ class QLearningTable extends RL{
         super(actions,learning_rate,reward_decay,e_greedy)
     }
     learn(s,a,r,s_){
-        this.checkStateExist(s_);
+        //this.checkStateExist(s_);
         const qPredict=this.q_table[s][this.actions.indexOf(a)];
         const qTarget=s_!=='terminal'?
             r + this.gamma * Math.max(...Object.values(this.q_table[s_])) :
             r;
         this.q_table[s][this.actions.indexOf(a)]+=this.lr*(qTarget-qPredict)
+        //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
     }
 }
 

@@ -10,7 +10,6 @@ const cost=document.getElementById('cost');
 //成本初始为0
 let C=0
 
-
 //定义去每个目标的概率
 let probability_g1,probability_g2;
 

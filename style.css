@@ -46,7 +46,7 @@ h1{
     
 }
 
-.q, .q-hero,.q-hero2 {
+.q, .q-hero,.q-observer {
     position: absolute;
     width: 40px;
     height: 40px;
@@ -54,7 +54,7 @@ h1{
     background-color: black;
 }
 
-.q-hero,.q-hero2 {
+.q-hero,.q-observer {
     position: absolute;
     background-color: rgba(0, 0, 0, 0);
     z-index: 3; /* 确保它覆盖在 .q 上 */
@@ -62,7 +62,9 @@ h1{
     background-size: cover; /* 使背景图片铺满整个元素 */
     background-position: center; /* 背景图片居中 */
 }
-
+.q-observer{
+    background-image: url(agent2.png);
+}
 .w {
     width: 40px;
     height: 40px;

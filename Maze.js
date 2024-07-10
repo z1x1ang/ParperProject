@@ -18,22 +18,24 @@ class Maze{
 constructor(){
 //初始化主角位置
 this.gridItems=document.getElementsByClassName('grid-item');
-this.newDiv = document.querySelector('.q-hero');
+this.agent1Div = document.querySelector('.q-hero');
+this.agent2Div = document.querySelector('.q-observer');
 //初始化动作空间 0上 1下 2左 3右
 this.action_space=[0,1,2,3]
 //初始化陷阱位置
-this.hell=[9];
-//初始化宝藏位置
+this.hell=[];
+//初始化宝藏位置 2改
 this.oval_pos=[4];
 // 初始化状态访问记录
 this.visited = new Array(this.gridItems.length).fill(false);
 }
 reset(){
-   this.gridItems[56].appendChild(this.newDiv);
+   this.gridItems[56].appendChild(this.agent1Div);
+   this.gridItems[50].appendChild(this.agent2Div);
    //重置visited数组全为0
    this.visited.fill(false);
    //返回起点位置
-   return 56;
+   return {observation:56,observation2:50};
 }
 delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

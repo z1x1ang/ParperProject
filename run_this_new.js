@@ -1,6 +1,7 @@
 import Maze from './Maze.js'
 import { QLearningTable } from './RL_brain.js';
 
+//改g1 rewardshaping 1改 Maze oval_pos二改 s_=9三改 delete四改
 let METHOD;
 //拿到页面设计端元素
 const gridItems = document.querySelectorAll('.grid-item');
@@ -36,8 +37,8 @@ probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //console.log(probability_g1);
 //console.log(probability_g2);
 //归一化 1e-18
-probability_g1=probability_g1/(f2);
-probability_g2=probability_g2/(f2);
+probability_g1=probability_g1/(f2+1e-15);
+probability_g2=probability_g2/(f2+1e-15);
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
@@ -98,19 +99,20 @@ function step(s_){
 async function update(){
     console.table(RL.q_table);
     for(let episode=0;episode<120;episode++){
-        //初始化装态
-        let observation=env.reset()
+        //初始化智能体1的装态
+        let {observation,observation2}=env.reset()
         let c=0;
         let tmp_policy={}
         while(true){
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
-            console.log("选择的行为"+action);
+            let action2=RL.chooseAction(observation2)
+            //console.log("选择的行为"+action);
             let state_item=observation
             console.log("当前的状态"+state_item);
             tmp_policy[state_item]=action
             //采取行为获得下一个状态和回报，以及是否终止
-            let {s_:observation_,reward,done,oval_flag}=env.step(action)
+            let {s_:observation_,reward,done,oval_flag,observation2_,reward2,done2}=env.step(action)
             console.log("获得的奖励"+reward);
             if(observation_!=state_item){
             step(observation_);
@@ -119,16 +121,10 @@ async function update(){
                 console.log("e是"+episode);
                 console.log("c是738"+c);
                 }
-            reward=reward+probability_g1*0.28;
+            reward=reward+probability_g1*0.2;
             console.log("重塑后的奖励"+reward)
         }
-            await delay(50);  // 延时50毫秒    
-            if(METHOD=="SARSA"){
-                //基于下一个状态选择行为
-                let action_=RL.chooseAction(observation_)
-                //基于变化(s,a,r,s',a')使用Sarsa进行Q更新
-                RL.learn(observation,action,reward,observation_,action_)
-            }
+            //await delay(50);  // 延时50毫秒    
             else if(METHOD=="Q-Learning"){
                 //根据当前变化更新Q
                 RL.learn(observation,action,reward,observation_)
@@ -136,7 +132,6 @@ async function update(){
             //改变状态和行为
             observation=observation_;
             c+=1;
-       
             //RL.updateEpsilon(episode);
             //如果为终止状态，结束当前的局数
             if(done) {
@@ -144,7 +139,6 @@ async function update(){
                 break;
             }
         }
-     break;
     }
     env.reset();
     console.log("120局游戏结束");

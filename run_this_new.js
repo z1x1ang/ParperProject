@@ -1,5 +1,5 @@
 import Maze from './Maze.js'
-import { QLearningTable } from './RL_brain.js';
+import { QLearningTable,ObserverRL} from './RL_brain.js';
 
 //改g1 rewardshaping 1改 Maze oval_pos二改 s_=9三改 delete四改
 let METHOD;
@@ -7,18 +7,12 @@ let METHOD;
 const gridItems = document.querySelectorAll('.grid-item');
 //获得cost元素
 const cost=document.getElementById('cost');
-
 //成本初始为0
-let C=0
-
-
+let C=0;
 //定义去每个目标的概率
 let probability_g1,probability_g2;
-
-
 //定义初始动作下标
 let i=0;
-
 async function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -37,12 +31,11 @@ probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //console.log(probability_g1);
 //console.log(probability_g2);
 //归一化 1e-18
-probability_g1=probability_g1/(f2+1e-15);
-probability_g2=probability_g2/(f2+1e-15);
+probability_g1=probability_g1/(f2);
+probability_g2=probability_g2/(f2);
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
-
 //计算可读性 分子
 //legiable_f1+=probability_g1*(T-cost);
 //计算可读性分母
@@ -54,15 +47,14 @@ document.getElementById("pg2").innerText=probability_g2;
 //document.getElementById("legibleValue").innerText=legibility;
 //console.log(legiable_f1/legiable_f2);
 }
-
     function get_policy(q_table) {
-      
         const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
-    
         Object.entries(q_table).forEach(([key, row]) => {
             if (key === 'terminal'||key==9) return; // 跳过terminal属性和无效的key
-            const maxVal = Math.max(...row);
-            const indices = row.reduce((indices, val, index) => {
+            // 获取每个动作的目标为0的Q值
+            const valuesForGoal0 = row.map(actionValues => actionValues[0]);
+            const maxVal = Math.max(...valuesForGoal0);
+            const indices = valuesForGoal0.reduce((indices, val, index) => {
                 return val === maxVal ? indices.concat(index) : indices;
             }, []);
             // 收集所有最大值对应的方向符号
@@ -97,23 +89,37 @@ function step(s_){
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
 }
 async function update(){
-    console.table(RL.q_table);
-    for(let episode=0;episode<120;episode++){
+    for(let episode=0;episode<240;episode++){
+        //随机初始化一个目标
+        //let goal=Math.ceil(Math.random()*2);
+        let goal=0;
+        if(goal==0){
+            RL.q_table['terminal']=RL.q_table[4];
+            delete RL.q_table[4];
+        }
+        else{
+            RL.q_table['terminal']=RL.q_table[9];
+            delete RL.q_table[9];
+        }
         //初始化智能体1的装态
         let {observation,observation2}=env.reset()
         let c=0;
         let tmp_policy={}
         while(true){
+        if(c==113){
+        console.log("niubi");
+        }
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
-            let action2=RL.chooseAction(observation2)
+            let action2=RL2.chooseAction(`${observation},${observation2}`)
             //console.log("选择的行为"+action);
             let state_item=observation
             console.log("当前的状态"+state_item);
             tmp_policy[state_item]=action
             //采取行为获得下一个状态和回报，以及是否终止
-            let {s_:observation_,reward,done,oval_flag,observation2_,reward2,done2}=env.step(action)
-            console.log("获得的奖励"+reward);
+        
+            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div)
+            let {s_:observation2_,reward:reward2,done:done2,oval_flag2}=env.step(action2,env.agent2Div)
             if(observation_!=state_item){
             step(observation_);
             if(isNaN(probability_g1)){
@@ -121,39 +127,44 @@ async function update(){
                 console.log("e是"+episode);
                 console.log("c是738"+c);
                 }
-            reward=reward+probability_g1*0.2;
+            reward=reward+probability_g1*0.19;
             console.log("重塑后的奖励"+reward)
         }
-            //await delay(50);  // 延时50毫秒    
-            else if(METHOD=="Q-Learning"){
+           await delay(100);  // 延时50毫秒    
+            if(METHOD=="Q-Learning"){
                 //根据当前变化更新Q
-                RL.learn(observation,action,reward,observation_)
+                RL.learn(observation,action,reward,observation_,goal)
+                if(done){observation_=goal?9:4;}
+                RL2.learn(`${observation} ,${observation2}`,action2,reward2, `${observation_},${observation2_}`,!goal)
             }
             //改变状态和行为
-            observation=observation_;
+            observation=observation_==4?'terminal':observation_;
+            observation2=observation2_;
             c+=1;
+            console.log("ccc"+c);
             //RL.updateEpsilon(episode);
             //如果为终止状态，结束当前的局数
-            if(done) {
-                C=0;
+        
+            if(done&&done2) {
+                C=0; 
                 break;
             }
         }
+      break;
     }
-    env.reset();
+    //env.reset();
     console.log("120局游戏结束");
-   
     //输出最终Q表
     let q_table_result=RL.q_table;
     //绘制相关箭头
     //console.log(q_table_result); // 打印出q_table看看是什么
-    get_policy(q_table_result);
+    //get_policy(q_table_result);
     //test(q_table_result);
     //policy?console.log("最优策略已收敛:",policy):console.log("最优策略未收敛");
     //console.table(q_table_result);
 }
 
-function test(q_table){
+function test(q_table ){
     let total_rewards=0;
     let action;
     for(let i=0;i<1;i++){
@@ -225,7 +236,6 @@ function test(q_table){
 gridItems.forEach(gridItem => {
     // 获取grid-item内的所有子元素
     const children = Array.from(gridItem.childNodes);
-
     // 遍历所有子元素
     children.forEach(child => {
         // 检查子元素是否具有需要保留的类
@@ -245,12 +255,14 @@ function calculator(){
 }
 function main() {
     window.env = new Maze(); // 假设Maze是一个有效的类
+    window.env2=new Maze();
     // 根据所选择的方法初始化RL实例
     if(METHOD==='SARSA'){
         window.RL=new SarsaTable(env.action_space);
     }
     else if(METHOD==='Q-Learning'){
         window.RL=new QLearningTable(env.action_space);
+        window.RL2=new ObserverRL(env.action_space)
     }
     // 启动更新过程
     update();

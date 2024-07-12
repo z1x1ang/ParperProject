@@ -65,6 +65,20 @@ h1{
 .q-observer{
     background-image: url(agent2.png);
 }
+.q-observer::after {
+    content: "P(g1|ξ)=0.5"; /* 悬浮字段的文本内容 */
+    white-space: nowrap;
+    position: absolute; /* 绝对定位，相对于 .q-observer 定位 */
+    top: -28px; /* 顶部对齐 */
+    right: -38px; /* 右边对齐 */
+    border: 1px solid rgb(255, 255, 255);
+    /* border-color: rgba(255, 255, 255, 0.9); 背景颜色，适当透明以突出文本 */
+    color: rgb(77, 12, 230); /* 文本颜色 */
+    padding: 5px 5px; /* 文本周围的填充，增加可读性 */
+    font-size: 10px; /* 字体大小 */
+    font-weight: bold;
+    z-index: 4; /* 确保文本在所有元素之上 */
+}
 .w {
     width: 40px;
     height: 40px;

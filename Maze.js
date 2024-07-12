@@ -1,19 +1,3 @@
-/*初始化 Q 表为所有状态和动作的随机值，范围在 [0, 2]
-对于每一次训练会话：
-    初始化状态 s
-    重复以下步骤直到会话结束：
-        以 ε-贪婪策略选择动作 a：
-            以概率 0.1 随机选择一个动作
-            以概率 0.9 选择使 Q(s, a) 最大化的动作
-        执行动作 a，观察奖励 r 和新状态 s'
-        如果 s' 是之前访问过的状态：
-            计算循环惩罚： r' = r - 0.2  (添加额外的惩罚以阻止循环行为)
-        否则：
-            r' = r
-        更新 Q 值：
-            Q(s, a) ← Q(s, a) + 0.9 * (r' + 0.9 * max(Q(s', a')) - Q(s, a))
-        s ← s'
-*/
 class Maze{
 constructor(){
 //初始化主角位置
@@ -25,7 +9,7 @@ this.action_space=[0,1,2,3]
 //初始化陷阱位置
 this.hell=[];
 //初始化宝藏位置 2改
-this.oval_pos=[4];
+this.oval_pos//=[4];
 // 初始化状态访问记录
 this.visited = new Array(this.gridItems.length).fill(false);
 }
@@ -41,10 +25,12 @@ delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-step(action,returnValue=true){
+step(action,agentDiv,returnValue=true){
+     //根据当前位置来获得回报值,及是否终止
     // 找到当前方块的位置
-    let currentIndex = Array.from(this.gridItems).findIndex(item => item.contains(this.newDiv));
+    let currentIndex = Array.from(this.gridItems).findIndex(item => item.contains(agentDiv));
     let s=currentIndex;
+    if(s==4) return {s,reward:null,done:true,oval_flag:true};
     let newIndex;
     switch(action){
     case 0:
@@ -68,20 +54,21 @@ step(action,returnValue=true){
         return;
  }
 
-
  //移动到新位置
- this.gridItems[newIndex].appendChild(this.newDiv);
+ this.gridItems[newIndex].appendChild(agentDiv);
  let s_ = newIndex; // 移动后的新状态
  if(!returnValue){
     return s_;
 }
+let reward, done, oval_flag = false;
+ if(agentDiv==this.agent1Div) this.oval_pos=[4]
+ else this.oval_pos=[9]
 
- //根据当前位置来获得回报值,及是否终止
- let reward, done, oval_flag = false;
  if(s_==this.oval_pos){
     reward=0;
     done=true;
-    s_="terminal";
+    if(agentDiv==this.agent1Div){
+        s_="terminal";}
     oval_flag=true;
 }
 

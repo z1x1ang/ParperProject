@@ -71,3 +71,103 @@ horizontalLine3.style.right = '0'; // 线的结束位置，与left为0一起确�
 
 </body>
 </html>
+<!--  for(let episode=0;episode<240;episode++){
+        //随机初始化一个目标
+        //let goal=Math.ceil(Math.random()*2);
+        let goal=0;
+        if(goal==0){
+            RL.q_table['terminal']=RL.q_table[4];
+            delete RL.q_table[4];
+        }
+        else{
+            RL.q_table['terminal']=RL.q_table[9];
+            delete RL.q_table[9];
+        }
+        //初始化智能体1的装态
+        let {observation,observation2}=env.reset()
+        let c=0;
+        let tmp_policy={}
+        while(true){
+        if(c==113){
+        console.log("niubi");
+        }
+            //基于当前状态S选择行为A
+            let action=RL.chooseAction(observation)
+            let action2=RL2.chooseAction(`${observation},${observation2}`)
+            //console.log("选择的行为"+action);
+            let state_item=observation
+            console.log("当前的状态"+state_item);
+            tmp_policy[state_item]=action
+            //采取行为获得下一个状态和回报，以及是否终止
+        
+            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div)
+            let {s_:observation2_,reward:reward2,done:done2,oval_flag2}=env.step(action2,env.agent2Div)
+            if(observation_!=state_item){
+            step(observation_);
+            if(isNaN(probability_g1)){
+                console.log("dc");
+                console.log("e是"+episode);
+                console.log("c是738"+c);
+                }
+            reward=reward+probability_g1*0.19;
+            console.log("重塑后的奖励"+reward)
+        }
+           await delay(100);  // 延时50毫秒    
+            if(METHOD=="Q-Learning"){
+                //根据当前变化更新Q
+                RL.learn(observation,action,reward,observation_,goal)
+                if(done){observation_=goal?9:4;}
+                RL2.learn(`${observation},${observation2}`,action2,reward2, `${observation_},${observation2_}`,!goal)
+            }
+            //改变状态和行为
+            observation=observation_;
+            observation2=observation2_;
+            c+=1;
+            console.log("ccc"+c);
+            //RL.updateEpsilon(episode);
+            //如果为终止状态，结束当前的局数
+        
+            if(done&&done2) {
+                C=0; 
+                break;
+            }
+        }
+      break;
+    }
+    //env.reset();
+    console.log("120局游戏结束");
+    //输出最终Q表
+    let q_table_result=RL.q_table;
+    //绘制相关箭头
+    //console.log(q_table_result); // 打印出q_table看看是什么
+    //get_policy(q_table_result);
+    //test(q_table_result);
+    //policy?console.log("最优策略已收敛:",policy):console.log("最优策略未收敛");
+    //console.table(q_table_result); 
+  
+  
+  if(Math.random()<1){
+                const stateActionValues = q_table[observation].map(actionValues => actionValues[0]);
+                // 找出最大值
+                const maxValue = Math.max(...stateActionValues);
+                // 找出所有最大值的索引
+                const maxIndexes = stateActionValues.reduce((indexes, currentValue, currentIndex) => {
+                    if (currentValue === maxValue) {
+                        indexes.push(currentIndex);
+                    }
+                    return indexes;
+                }, []);
+        //从最大值索引中随机选择一个
+        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
+        action=randomIndex;
+        } else {
+            // 随机选择动作
+            const randomIndex = Math.floor(Math.random() * RL.actions.length);
+            action=randomIndex;
+        }
+  
+  
+  
+  
+  
+  -->

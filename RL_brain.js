@@ -64,7 +64,6 @@ class QLearningTable extends RL{
     }
     learn(s,a,r,s_,goal){
         if(s=='terminal') return;
-        console.log(s+"  "+s_);
         const qPredict=this.q_table[s][this.actions.indexOf(a)][goal];
         const qTarget=s_!=='terminal'?
             r + this.gamma * Math.max(...Object.values(this.q_table[s_].map(actionValues => actionValues[goal]))) :
@@ -110,7 +109,7 @@ class ObserverRL extends RL {
     }
     catch(error){
         throw new Error("An error occurred: " + observation);
-    }
+         }
         } else {
             // 随机选择动作
             const randomIndex = Math.floor(this.random() * this.actions.length);
@@ -128,8 +127,6 @@ class ObserverRL extends RL {
         this.q_table[s][this.actions.indexOf(a)][goal]+=this.lr*(qTarget-qPredict)
         //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
     }
-
-
 }
 export { ObserverRL };
 export {QLearningTable};

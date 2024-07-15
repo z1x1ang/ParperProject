@@ -30,7 +30,7 @@ step(action,agentDiv,returnValue=true){
     // 找到当前方块的位置
     let currentIndex = Array.from(this.gridItems).findIndex(item => item.contains(agentDiv));
     let s=currentIndex;
-    if(s==4) return {s,reward:null,done:true,oval_flag:true};
+    if(s==4&&agentDiv==this.agent1Div) return {s,reward:null,done:true,oval_flag:true};
     let newIndex;
     switch(action){
     case 0:
@@ -54,12 +54,14 @@ step(action,agentDiv,returnValue=true){
         return;
  }
 
- //移动到新位置
- this.gridItems[newIndex].appendChild(agentDiv);
  let s_ = newIndex; // 移动后的新状态
  if(!returnValue){
     return s_;
 }
+
+ //移动到新位置
+ this.gridItems[newIndex].appendChild(agentDiv);
+
 let reward, done, oval_flag = false;
  if(agentDiv==this.agent1Div) this.oval_pos=[4]
  else this.oval_pos=[9]
@@ -78,15 +80,18 @@ let reward, done, oval_flag = false;
 //     s_="terminal";
 // }
 else if(!this.visited[s_]){
-    reward = -0.1; // 首次访问非目标状态的惩罚
     this.visited[s_] = true; // 标记为已访问
     done = false;
+    if(agentDiv==this.agent2Div){
+        reward=-0.2
+    }
+    else reward=-0.1
 } else {
     reward = -0.2; // 重新访问非目标状态的惩罚
     done = false;
 }
 return {s_,reward,done,oval_flag}
-}
+} 
 //根据传入策略进行界面渲染
 render_by_policy(){
     console.log("成功");

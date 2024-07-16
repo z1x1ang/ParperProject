@@ -66,15 +66,10 @@ document.getElementById("pg2").innerText=probability_g2;
         });  
     }
     function get_policy2(q_table) {
-       
         const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
         Object.entries(q_table).forEach(([key, row]) => {
-         
             const [state1, state2] = key.split(',').map(Number); // 拆分状态，转换为数字
-         
-            if (key === 'terminal' || state2 == 9) return; // 跳过terminal属性和不需要处理的状态
-            
-            
+            if (key === 'terminal' || state2 == 9|| state1!=`4`) return; // 跳过terminal属性和不需要处理的状态
              // 确保gridItems中存在当前key
         // if (!(key in gridItems)) {
         //     console.warn(`警告: gridItems 中不存在键 ${key}`);
@@ -86,13 +81,10 @@ document.getElementById("pg2").innerText=probability_g2;
             const indices = valuesForGoal1.reduce((indices, val, index) => {
                 return val === maxVal ? indices.concat(index) : indices;
             }, []);
-            
             // 收集所有最大值对应的方向符号
             let symbolsToShow = indices.map(index => directionSymbols[index]).join('');
-            
             // 设置收集到的符号到对应的gridItem
             gridItems[state2].textContent = symbolsToShow;
-            
             // console.log(`第${key}行最大下标分别是${indices}`);
         });
     }
@@ -171,13 +163,13 @@ async function update(){
             
         }
         if(!done2){
-        action2=RL2.chooseAction(`${observation},${observation2}`);
+        action2=RL2.chooseAction(`4,${observation2}`);
             //采取行为获得下一个状态和回报，以及是否终止
             ({s_:observation2_,reward:reward2,done:done2,oval_flag:oval_flag2}=env.step(action2,env.agent2Div));
             //await delay(100);  // 延时50毫秒    
                 //根据当前变化更新Q
                 if(done){ observation=observation_=goal?9:4; }
-                RL2.learn(`${observation},${observation2}`,action2,reward2, `${observation_},${observation2_}`,!goal)
+                RL2.learn(`4,${observation2}`,action2,reward2, `4,${observation2_}`,!goal)
         }
 
         //改变状态和行为
@@ -194,8 +186,8 @@ async function update(){
              }
         }
     }
-    console.log(RL2.q_table);
-    //get_policy(RL.q_table)
+    //console.log(RL2.q_table);
+    get_policy2(RL2.q_table)
     //env.reset();
     console.log("240局游戏结束");
     //输出最终Q表

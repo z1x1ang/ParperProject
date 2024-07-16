@@ -32,8 +32,8 @@ probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //console.log(probability_g1);
 //console.log(probability_g2);
 //归一化 1e-18
-probability_g1=probability_g1/(f2+1e-60);
-probability_g2=probability_g2/(f2+1e-60);
+probability_g1=probability_g1/(f2+1e-65);
+probability_g2=probability_g2/(f2+1e-65);
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
@@ -142,7 +142,6 @@ async function update(){
             //基于当前状态S选择行为A
             action=RL.chooseAction(observation);
             console.log(action);
-  
             ({s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div));
             //console.log("选择的行为"+action);
             let state_item=observation

@@ -93,7 +93,8 @@ class ObserverRL extends RL {
         if (this.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
-            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
+            //goal需要改 
+            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[1]);
             // 找出最大值
             const maxValue = Math.max(...stateActionValues);
             // 找出所有最大值的索引
@@ -119,10 +120,10 @@ class ObserverRL extends RL {
 
     learn(s,a,r,s_,goal){
         goal=goal?1:0;
-        if(s==9) return;
         const qPredict=this.q_table[s][this.actions.indexOf(a)][goal];
-        //9号目标
-        const qTarget=s_.split(',')[1]!=='9'?
+        //根据智能体1的goal判断智能体2是几号目标
+        let stringGoal=goal?'4':'9';
+        const qTarget=s_.split(',')[1]!==stringGoal?
             r + this.gamma * Math.max(...Object.values(this.q_table[s_].map(actionValues => actionValues[goal]))) :
             r;
         this.q_table[s][this.actions.indexOf(a)][goal]+=this.lr*(qTarget-qPredict)

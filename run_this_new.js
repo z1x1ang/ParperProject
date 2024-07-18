@@ -70,7 +70,7 @@ document.getElementById("pg2").innerText=probability_g2;
     }
     function get_policy2(q_table) {
         const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
-        Object.entries(q_table).forEach(([key, row]) => {
+        Object.entries(q_table).filter(([key])=>key.split(',')[0]=='4').forEach(([key, row]) => {
             const [state1, state2] = key.split(',').map(Number); // 拆分状态，转换为数字
             //state1!=10
             if (key === 'terminal' || state2 == 9) return; // 跳过terminal属性和不需要处理的状态
@@ -118,6 +118,7 @@ function step(s_){
 
 async function update(){
     //let goal=Math.ceil(Math.random()*2);
+    //设置智能体1的目标 0代表黄色目标
     let goal=0;
     if(goal==0){
         RL.q_table['terminal']=RL.q_table[4];
@@ -168,8 +169,9 @@ async function update(){
 
 //console.log(agent1States);
     //训练智能体2
-    for(let episode=0;episode<120;episode++){
+    for(let episode=0;episode<240;episode++){
         //随机初始化一个目标
+        //goal=Math.floor(Math.random() * 2);
         //初始化智能体1的装态
         let {observation2}=env.reset()
         let c=0;
@@ -186,8 +188,6 @@ async function update(){
             //改变状态和行为
             //observation=observation_;
             observation2=observation2_;
-            if(observation2==9)
-            {console.log("hahahahaha")}; 
             //await delay(50);  // 延时50毫秒  
             c+=1;
             //RL.updateEpsilon(episode);
@@ -200,7 +200,7 @@ async function update(){
         }
     }
     console.log(RL2.q_table);
-    //get_policy(RL.q_table)
+    get_policy2(RL2.q_table);
     //env.reset();
     console.log("120局游戏结束");
     //输出最终Q表

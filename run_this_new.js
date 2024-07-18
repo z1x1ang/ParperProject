@@ -34,6 +34,9 @@ probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //归一化 1e-65
 probability_g1=probability_g1/(f2+1e-65); 
 probability_g2=probability_g2/(f2+1e-65);
+if(probability_g1>0.5){
+    document.querySelector('.q-observer').classList.add('new-style');
+}
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
 document.getElementById("pg2").innerText=probability_g2;
@@ -163,7 +166,6 @@ async function update(){
 //智能体1训练完成，保存其最优策略对应的状态集合
 //let agent1States = await test(RL.q_table, env.agent1Div);
 
-let twice=false;
 //console.log(agent1States);
     //训练智能体2
     for(let episode=0;episode<120;episode++){
@@ -311,7 +313,7 @@ async function test(q_table,agentDiv){
         //控制概率
         console.log(observation);
         step(observation)
-        
+
         await delay(500)
         }
         if(isDone) {

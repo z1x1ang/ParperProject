@@ -1,7 +1,6 @@
-* {
+*{
     box-sizing: border-box;
 }
-
 body {
     font-family: Arial, Helvetica, sans-serif;
     /* background-color:  rgb(19,36,23); */
@@ -36,14 +35,12 @@ h1{
     margin: 0px auto;
     background-color: rgba(255, 255, 255, 0.8);
 }
-
 .grid-item {
     display: flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */;
     border: 1px solid rgba(0, 0, 0, 0.8);
     position: relative;
-    
 }
 
 .q, .q-hero,.q-observer {
@@ -70,15 +67,20 @@ h1{
     white-space: nowrap;
     position: absolute; /* 绝对定位，相对于 .q-observer 定位 */
     top: -28px; /* 顶部对齐 */
-    right: -38px; /* 右边对齐 */
+    right: -12px; /* 右边对齐 */
     border: 1px solid rgb(255, 255, 255);
     /* border-color: rgba(255, 255, 255, 0.9); 背景颜色，适当透明以突出文本 */
     color: rgb(77, 12, 230); /* 文本颜色 */
-    padding: 5px 5px; /* 文本周围的填充，增加可读性 */
+    padding: 3px 5px; /* 文本周围的填充，增加可读性 */
     font-size: 10px; /* 字体大小 */
     font-weight: bold;
     z-index: 4; /* 确保文本在所有元素之上 */
 }
+
+.q-observer.new-style::after {
+    color: rgb(255, 0, 0);  /* 改变颜色为红色 */
+}
+
 .w {
     width: 40px;
     height: 40px;
@@ -88,7 +90,6 @@ h1{
     background-size: cover; /* 使背景图片铺满整个元素 */
     background-position: center; /* 背景图片居中 */
 }
-
 .btn {
     background: #3498db;
     background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
@@ -105,7 +106,6 @@ h1{
     padding: 6px 10px 6px 10px;
     text-decoration: none;
   }
-  
   .btn:hover {
     background: #3cb0fd;
     background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
@@ -115,7 +115,6 @@ h1{
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
   }
-
   /* Horizontal line */
   .line {
     position: absolute;

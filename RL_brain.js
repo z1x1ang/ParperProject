@@ -119,6 +119,7 @@ class ObserverRL extends RL {
 
     learn(s,a,r,s_,goal){
         goal=goal?1:0;
+        if(s==9) return;
         const qPredict=this.q_table[s][this.actions.indexOf(a)][goal];
         //9号目标
         const qTarget=s_.split(',')[1]!=='9'?
@@ -128,5 +129,5 @@ class ObserverRL extends RL {
         //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
     }
 }
-export { ObserverRL };
+export {ObserverRL};
 export {QLearningTable};

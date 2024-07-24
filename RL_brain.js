@@ -94,7 +94,7 @@ class ObserverRL extends RL {
             // ε-greedy 策略选择动作
             try{
             //goal需要改 
-            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[1]);
+            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[agent2Goal]);
             // 找出最大值
             const maxValue = Math.max(...stateActionValues);
             // 找出所有最大值的索引

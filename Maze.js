@@ -18,8 +18,12 @@ reset(){
    this.gridItems[50].appendChild(this.agent2Div);
    //重置visited数组全为0
    this.visited.fill(false);
+   //还原伪元素的标志
+   document.querySelector('.q-observer').classList.remove('new-style');
+   document.querySelector('.q-observer').classList.remove('new-style2');
+
    //返回起点位置
-   return {observation:56,observation2:50};
+   return {observation:agent,observation2:observer};
 }
 delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -63,9 +67,9 @@ step(action,agentDiv,returnValue=true){
  this.gridItems[newIndex].appendChild(agentDiv);
 
 let reward, done, oval_flag = false;
- if(agentDiv==this.agent1Div) this.oval_pos=[4]
- else this.oval_pos=[9]
-
+ if(agentDiv==this.agent1Div) this.oval_pos=[4];
+ else this.oval_pos=agent2Goal?9:4;
+ 
  if(s_==this.oval_pos){
     reward=0;
     done=true;
@@ -73,7 +77,6 @@ let reward, done, oval_flag = false;
         s_="terminal";}
     oval_flag=true;
 }
-
 // else if(this.hell.includes(s_)){
 //     reward=-0.1;
 //     done=false;

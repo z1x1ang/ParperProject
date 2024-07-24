@@ -34,8 +34,16 @@ probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
 //归一化 1e-65
 probability_g1=probability_g1/(f2+1e-65); 
 probability_g2=probability_g2/(f2+1e-65);
-if(probability_g1>0.5){
+if(parseFloat(probability_g1.toFixed(3))>0.5){
     document.querySelector('.q-observer').classList.add('new-style');
+}
+else if(parseFloat(probability_g1.toFixed(3))<0.5){
+    document.querySelector('.q-observer').classList.add('new-style2');
+}
+else{
+    document.querySelector('.q-observer').classList.remove('new-style2');
+    document.querySelector('.q-observer').classList.remove('new-style');
+
 }
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
@@ -70,17 +78,18 @@ document.getElementById("pg2").innerText=probability_g2;
     }
     function get_policy2(q_table) {
         const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
+        //只遍历state1为终点(4)的状态
         Object.entries(q_table).filter(([key])=>key.split(',')[0]=='4').forEach(([key, row]) => {
             const [state1, state2] = key.split(',').map(Number); // 拆分状态，转换为数字
-            //state1!=10
-            if (key === 'terminal' || state2 == 9) return; // 跳过terminal属性和不需要处理的状态
-             // 确保gridItems中存在当前key
-        // if (!(key in gridItems)) {
-        //     console.warn(`警告: gridItems 中不存在键 ${key}`);
-        //     return;
-        // }
-            // 获取每个动作的第二个值的Q值
-            const valuesForGoal1 = row.map(actionValues => actionValues[1]);
+            //state1!=10 不会出现terminal
+            if (state2==target0||state2 == target1) return; // 跳过terminal属性和不需要处理的状态
+            // 确保gridItems中存在当前key
+            // if (!(key in gridItems)) {
+            //     console.warn(`警告: gridItems 中不存在键 ${key}`);
+            //     return;
+            // }
+            // 获取每个动作的第二个值的Q值 ~~~~~~~~~~~改这个1
+            const valuesForGoal1 = row.map(actionValues => actionValues[showGoal]);
             const maxVal = Math.max(...valuesForGoal1);
             const indices = valuesForGoal1.reduce((indices, val, index) => {
                 return val === maxVal ? indices.concat(index) : indices;
@@ -119,8 +128,8 @@ function step(s_){
 async function update(){
     //let goal=Math.ceil(Math.random()*2);
     //设置智能体1的目标 0代表黄色目标
-    let goal=0;
-    if(goal==0){
+    //agent1Goal始终是0
+    if(agent1Goal==0){
         RL.q_table['terminal']=RL.q_table[4];
         delete RL.q_table[4];
     }
@@ -159,19 +168,21 @@ async function update(){
             //如果为终止状态，结束当前的局数
             if(done) {
                  C=0; 
-                 console.log("c是"+c);
                  break;
              }
         }
-    }
+    }  
 //智能体1训练完成，保存其最优策略对应的状态集合
 //let agent1States = await test(RL.q_table, env.agent1Div);
 
 //console.log(agent1States);
+let xx=0
     //训练智能体2
     for(let episode=0;episode<240;episode++){
         //随机初始化一个目标
-        //goal=Math.floor(Math.random() * 2);
+        agent2Goal=Math.floor(Math.random()*2);
+    //agent2Goal=1;
+
         //初始化智能体1的装态
         let {observation2}=env.reset()
         let c=0;
@@ -199,8 +210,9 @@ async function update(){
              }
         }
     }
+    console.log(xx);
     console.log(RL2.q_table);
-    get_policy2(RL2.q_table);
+    //get_policy(RL.q_table);
     //env.reset();
     console.log("120局游戏结束");
     //输出最终Q表
@@ -214,7 +226,7 @@ async function update(){
 }
 //收完整值
 //定义nengdan函数，调用时，接受(状态两个状态，返回第二个智能体所能做的最优动作)
-function nengdan(observation,q_table){
+function queryAction2(observation,q_table){
             // let total_rewards=0;
             // let action;
             // let actions=[];
@@ -225,7 +237,16 @@ function nengdan(observation,q_table){
             //childDiv.className = 'line'; // 给新的子元素添加类名 'q'
             observation=observation.split(',')[0]=='terminal'?'4,'+observation.split(',')[1]:observation;
             //if(observation.split(',')[1]=='9') return;
-            const stateActionValues=q_table[observation].map(actionValues => actionValues[1]);
+            let tag2Goal;
+            if(probability_g1.toFixed(3)>0.5){
+                tag2Goal=1;
+            }
+            else if(probability_g1.toFixed(3)<0.5){tag2Goal=0}
+            else {tag2Goal=Math.floor(Math.random() * 2);
+                console.log(tag2Goal);
+
+            }
+            const stateActionValues=q_table[observation].map(actionValues => actionValues[tag2Goal]);
             // 找出最大值
             const maxValue = Math.max(...stateActionValues);
             // 找出所有最大值的索引
@@ -247,10 +268,15 @@ async function test(q_table,agentDiv){
     let action;
     let action2s=[];
     let actions=[];
+    //实验所用轨迹
+    let actiontest=[0,0,0,0,0,0,3,3]
+    let i=0;
     for(let i=0;i<1;i++){
         let {observation,observation2}=env.reset();
         let isDone=false;
-        while(!isDone){
+        let isDone2=false;
+        while(!(isDone&&isDone2)){
+            if(!isDone){
             const childDiv = document.createElement('div');
             childDiv.className = 'line'; // 给新的子元素添加类名 'q'
             //针对智能体1
@@ -270,6 +296,8 @@ async function test(q_table,agentDiv){
         action=randomIndex;
             
         }
+        //~~~~~~~~指定测试可读性轨迹
+        action=actiontest[i++];
         if(action==0){
             childDiv.style.top = '-54.5%';
             childDiv.style.bottom='47.5%';
@@ -299,24 +327,28 @@ async function test(q_table,agentDiv){
             gridItems[observation].appendChild(childDiv);
         }
         let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div);
-        if(observation2!=9) {action2s.push(nengdan(`${4},${observation2}`,RL2.q_table))}
+        agent1States.push(observation)
+        if(observation!=4)observation=observation_; 
+        //控制概率
+        step(observation)
+        isDone=done;
+
+    }
+        //9是终点
+        if(observation2!=9) {
+        action2s.push(queryAction2(`${4},${observation2}`,RL2.q_table))
         let {s_:observation2_,reward:reward2,done:done2,oval_flag2}=env.step(action2s[action2s.length-1],env.agent2Div)
+        observation2=observation2_;    
         actions.push(action)
         //let observation_=env.step(action,env.agent1Div,false);
-        isDone=done;
+        isDone2=done2;
+    }
         //isDone=observation_==4?true:false;
         //total_rewards+=reward;
         //注意
-        agent1States.push(observation)
-        if(observation!=4)observation=observation_; 
-        if(observation2!=9)observation2=observation2_;
-        //控制概率
-        console.log(observation);
-        step(observation)
-
-        await delay(500)
+        await delay(1000)
         }
-        if(isDone) {
+        if(isDone&&isDone2) {
             console.log(actions);
             console.log(action2s);
             //控制动画的播放
@@ -345,10 +377,6 @@ gridItems.forEach(gridItem => {
     env.reset();
 }
 
-
-
-
-
 function main() {
     window.env = new Maze(); // 假设Maze是一个有效的类
     window.env2=new Maze();
@@ -358,7 +386,7 @@ function main() {
     }
     else if(METHOD==='Q-Learning'){
         window.RL=new QLearningTable(env.action_space);
-        window.RL2=new ObserverRL(env.action_space)
+        window.RL2=new ObserverRL(env.action_space);
     }
     // 启动更新过程
     update();

@@ -10,7 +10,9 @@ window.target1 = 9;
 //判定Q表数组采取的列数
 //0代表目标是target0:4第一列，1代表目标是target1:9第二列 agent1Goal始终是0
 window.agent1Goal=0;
-window.agent2Goal=0;
+
+//agent2Goal随机 showGoal1=1乱
+window.agent2Goal=1;
 
 //调控get_policy2函数显示谁的策略
- window.showGoal=1;
+ window.showGoal=0;

@@ -13,7 +13,7 @@ class RL{
         //delete this.q_table[4];
         this.i=0;
         //设置随机种子
-        this.random=new Math.seedrandom('2024');
+        //this.random=new Math.seedrandom('2024');
     }
     //observation 某个状态state，0,1,2,3
     chooseAction(observation) {
@@ -21,7 +21,7 @@ class RL{
         //this.checkStateExist(observation); // 确保状态存在
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++]
-        if (this.random() < this.epsilon) {
+        if (Math.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
@@ -35,7 +35,7 @@ class RL{
                 return indexes;
             }, []);
         // 从最大值索引中随机选择一个
-        const randomIndex = maxIndexes[Math.floor(this.random() * maxIndexes.length)];
+        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
         return this.actions[randomIndex]; // 根据最大价值随机选择动作
     }
     catch(error){
@@ -43,7 +43,7 @@ class RL{
     }
      } else {
             // 随机选择动作
-            const randomIndex = Math.floor(this.random() * this.actions.length);
+            const randomIndex = Math.floor(Math.random() * this.actions.length);
             return this.actions[randomIndex];
         }
     }
@@ -90,11 +90,10 @@ class ObserverRL extends RL {
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++]
         observation=observation.split(',')[0]=='terminal'?'4,'+observation.split(',')[1]:observation;
-        if (this.random() < this.epsilon) {
+        if (Math.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
-            //goal需要改 
-            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[agent2Goal]);
+            const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
             // 找出最大值
             const maxValue = Math.max(...stateActionValues);
             // 找出所有最大值的索引
@@ -105,7 +104,7 @@ class ObserverRL extends RL {
                 return indexes;
             }, []);
         // 从最大值索引中随机选择一个
-        const randomIndex = maxIndexes[Math.floor(this.random() * maxIndexes.length)];
+        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
         return this.actions[randomIndex]; // 根据最大价值随机选择动作
     }
     catch(error){
@@ -113,7 +112,7 @@ class ObserverRL extends RL {
          }
         } else {
             // 随机选择动作
-            const randomIndex = Math.floor(this.random() * this.actions.length);
+            const randomIndex = Math.floor(Math.random() * this.actions.length);
             return this.actions[randomIndex];
         }
     }
@@ -121,14 +120,13 @@ class ObserverRL extends RL {
     learn(s,a,r,s_,goal){
         goal=goal?1:0;
         const qPredict=this.q_table[s][this.actions.indexOf(a)][goal];
-        //根据智能体1的goal判断智能体2是几号目标
-        let stringGoal=goal?'4':'9';
-        const qTarget=s_.split(',')[1]!==stringGoal?
+        //9号目标
+        const qTarget=s_.split(',')[1]!=='9'?
             r + this.gamma * Math.max(...Object.values(this.q_table[s_].map(actionValues => actionValues[goal]))) :
             r;
         this.q_table[s][this.actions.indexOf(a)][goal]+=this.lr*(qTarget-qPredict)
         //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
     }
 }
-export {ObserverRL};
+export { ObserverRL };
 export {QLearningTable};

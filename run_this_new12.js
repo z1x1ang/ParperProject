@@ -60,7 +60,6 @@ legibility=legiable_f1/legiable_f2;
 document.getElementById("legibleValue").innerText=legibility;
 console.log(legiable_f1/legiable_f2);
 }
-
     function get_policy(q_table) {
         const directionSymbols = ['⭡', '⭣', '⭠', '⭢']; // 映射表，索引对应于方向
         Object.entries(q_table).forEach(([key, row]) => {
@@ -98,16 +97,16 @@ function step(q_table){
     updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
 }
 async function update(){
-    let cc=0;
-    for(let episode=0;episode<1200;episode++){
+    let c=0;
+    for(let episode=0;episode<120;episode++){
         //初始化装态
         let {observation}=env.reset()
         //let observation=56;
-        let c=0;
         let tmp_policy={}
-        while(true){
-        console.log("tkl");
-           
+        while(true){          
+            if(c==11){
+                console.log("11le");
+            } 
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
             let state_item=observation

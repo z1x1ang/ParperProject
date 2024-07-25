@@ -13,15 +13,15 @@ class RL{
         //delete this.q_table[4];
         this.i=0;
         //设置随机种子
-        //this.random=new Math.seedrandom('2024');
+        this.random=new Math.seedrandom('2024');
     }
     //observation 某个状态state，0,1,2,3
     chooseAction(observation) {
         if(observation=="terminal") return;
         //this.checkStateExist(observation); // 确保状态存在
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
-        //return this.actionArray[this.i++]
-        if (Math.random() < this.epsilon) {
+        //return this.actionArray[this.i++],始终保持较大的探索，使得agent可以学习到更完整的策略，在不同的状态下尽可能多的展示出最优策略
+        if (this.random() > this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
@@ -35,7 +35,7 @@ class RL{
                 return indexes;
             }, []);
         // 从最大值索引中随机选择一个
-        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
+        const randomIndex = maxIndexes[Math.floor(this.random() * maxIndexes.length)];
         return this.actions[randomIndex]; // 根据最大价值随机选择动作
     }
     catch(error){
@@ -43,7 +43,7 @@ class RL{
     }
      } else {
             // 随机选择动作
-            const randomIndex = Math.floor(Math.random() * this.actions.length);
+            const randomIndex = Math.floor(this.random() * this.actions.length);
             return this.actions[randomIndex];
         }
     }
@@ -90,7 +90,7 @@ class ObserverRL extends RL {
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++]
         observation=observation.split(',')[0]=='terminal'?'4,'+observation.split(',')[1]:observation;
-        if (Math.random() < this.epsilon) {
+        if (this.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
@@ -104,7 +104,7 @@ class ObserverRL extends RL {
                 return indexes;
             }, []);
         // 从最大值索引中随机选择一个
-        const randomIndex = maxIndexes[Math.floor(Math.random() * maxIndexes.length)];
+        const randomIndex = maxIndexes[Math.floor(this.random() * maxIndexes.length)];
         return this.actions[randomIndex]; // 根据最大价值随机选择动作
     }
     catch(error){
@@ -112,7 +112,7 @@ class ObserverRL extends RL {
          }
         } else {
             // 随机选择动作
-            const randomIndex = Math.floor(Math.random() * this.actions.length);
+            const randomIndex = Math.floor(this.random() * this.actions.length);
             return this.actions[randomIndex];
         }
     }

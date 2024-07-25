@@ -90,7 +90,7 @@ class ObserverRL extends RL {
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++]
         observation=observation.split(',')[0]=='terminal'?'4,'+observation.split(',')[1]:observation;
-        if (this.random() < this.epsilon) {
+        if (this.random() > this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);

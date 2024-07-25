@@ -104,9 +104,6 @@ async function update(){
         //let observation=56;
         let tmp_policy={}
         while(true){          
-            if(c==11){
-                console.log("11le");
-            } 
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
             let state_item=observation

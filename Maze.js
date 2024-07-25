@@ -89,7 +89,7 @@ else if(!this.visited[s_]){
         reward=-0.2
     }
     //__需立即修正____________
-    else reward=-0.1
+    else reward=-0.2
 } else {
     reward = -0.2; // 重新访问非目标状态的惩罚
     done = false;

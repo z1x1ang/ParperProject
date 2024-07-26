@@ -130,10 +130,6 @@ class ObserverRL extends RL {
         //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
         const logValue = this.q_table[s][this.actions.indexOf(a)][goal];
         //console.log(logValue);
-        this.i++;
-        if(this.i==1000){
-            console.log(logValue);
-        }
         // Save the result to the log array
         this.logData.push(logValue);
     }

@@ -172,25 +172,17 @@ async function update(){
     }  
 //智能体1训练完成，保存其最优策略对应的状态集合
 //let agent1States = await test(RL.q_table, env.agent1Div);
-console.log("1执行完了");
 //console.log(agent1States);
     //训练智能体2
-    for(let episode=0;episode<120;episode++){
-
+    for(let episode=0;episode<240;episode++){
         let c=0;
-
         //随机初始化一个目标
-        //agent2Goal=Math.floor(Math.random()*2);
-        agent2Goal=0;
+        agent2Goal=Math.floor(Math.random()*2);
+       // agent2Goal=0;
         //初始化智能体1的装态
         let {observation2}=env.reset() 
-     
         let tmp_policy={}
         while(true){
-            if(episode==1&&c==416){
-                console.log("dt");
-            }
-
             //2到2停止
             let action2=RL2.chooseAction(`${4},${observation2}`);
             //let action2=RL2.chooseAction(`${agent1States[c>=agent1States.length-1?agent1States.length-1:c]},${observation2}`);
@@ -222,7 +214,7 @@ console.log("1执行完了");
 
     //RL2.downloadLog();
     //绘制相关箭头
-    console.log(RL2.q_table);
+    //console.log(RL2.q_table);
     //get_policy(q_table_result);
     //test(q_table_result);
     //policy?console.log("最优策略已收敛:",policy):console.log("最优策略未收敛");
@@ -247,9 +239,9 @@ function queryAction2(observation,q_table){
                 tag2Goal=1;
             }
             else if(probability_g1.toFixed(3)<0.5){tag2Goal=0}
-            else {tag2Goal=Math.floor(Math.random() * 2);
+            else {
+                tag2Goal=Math.floor(Math.random() * 2);
                 console.log(tag2Goal);
-
             }
             const stateActionValues=q_table[observation].map(actionValues => actionValues[tag2Goal]);
             // 找出最大值

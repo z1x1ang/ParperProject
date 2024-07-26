@@ -128,8 +128,8 @@ async function update(){
     //设置智能体1的目标 0代表黄色目标
     //agent1Goal始终是0
     if(agent1Goal==0){
-        RL.q_table['terminal']=RL.q_table[4];
-        delete RL.q_table[4];
+        RL.q_table['terminal']=RL.q_table[target0];
+        delete RL.q_table[target0];
     }
     else{
         RL.q_table['terminal']=RL.q_table[9];
@@ -142,11 +142,13 @@ async function update(){
         let c=0;
         let tmp_policy={}
         while(true){
+         if(episode==1&&c==438){
+            console.log("ta");
+         }
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation);
             let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div)
             //({s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div));
-            //console.log("选择的行为"+action);
             let state_item=observation
             tmp_policy[state_item]=action
             if(observation_!=state_item){
@@ -265,7 +267,7 @@ async function test(q_table,agentDiv){
     let action2s=[];
     let actions=[];
     //实验所用轨迹
-    let actiontest=[0,0,0,0,0,0,3,3]
+    let actiontest=[3,3,0,0,0,0,0]
     let i=0;
     for(let i=0;i<1;i++){
         let {observation,observation2}=env.reset();

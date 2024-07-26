@@ -1,8 +1,8 @@
 // config.js 基本参数设置 
 //基本布局参数
 window.agent=56;
-window.observer = 50;
-window.target0 = 4;
+window.observer = 57;
+window.target0 = 13;
 window.target1 = 9;
 
 //判定Q表数组采取的列数

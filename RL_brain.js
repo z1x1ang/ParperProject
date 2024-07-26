@@ -9,7 +9,7 @@ class RL{
             this.q_table[state] = Array.from({length: this.actions.length}, () => [0,0]);
         }
         // 在循环外更改状态4的键为'terminal'
-        this.q_table['terminal'] //= this.q_table[4];
+        this.q_table['terminal'] 
         //delete this.q_table[4];
         this.i=0;
 

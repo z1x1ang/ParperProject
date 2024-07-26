@@ -14,8 +14,8 @@ this.oval_pos//=[4];
 this.visited = new Array(this.gridItems.length).fill(false);
 }
 reset(){
-   this.gridItems[56].appendChild(this.agent1Div);
-   this.gridItems[50].appendChild(this.agent2Div);
+   this.gridItems[agent].appendChild(this.agent1Div);
+   this.gridItems[observer].appendChild(this.agent2Div);
    //重置visited数组全为0
    this.visited.fill(false);
    //还原伪元素的标志
@@ -34,7 +34,7 @@ step(action,agentDiv,returnValue=true){
     // 找到当前方块的位置
     let currentIndex = Array.from(this.gridItems).findIndex(item => item.contains(agentDiv));
     let s=currentIndex;
-    if(s==4&&agentDiv==this.agent1Div) return {s,reward:null,done:true,oval_flag:true};
+    if(s==target0&&agentDiv==this.agent1Div) return {s,reward:null,done:true,oval_flag:true};
     let newIndex;
     switch(action){
     case 0:

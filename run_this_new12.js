@@ -100,7 +100,8 @@ async function update(){
     let c=0;
     for(let episode=0;episode<120;episode++){
         //初始化装态
-        let {observation}=env.reset()
+        let {observation2}=env.reset()
+        let observation=observation2;
         //let observation=56;
         let tmp_policy={}
         while(true){          
@@ -109,7 +110,7 @@ async function update(){
             let state_item=observation
             tmp_policy[state_item]=action
             //采取行为获得下一个状态和回报，以及是否终止
-            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div)
+            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent2Div)
             // await delay(50);  // 延时50毫秒    
             if(METHOD=="SARSA"){
                 //基于下一个状态选择行为

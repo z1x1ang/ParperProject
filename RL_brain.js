@@ -12,6 +12,8 @@ class RL{
         this.q_table['terminal'] //= this.q_table[4];
         //delete this.q_table[4];
         this.i=0;
+
+        this.logData = []; // Array to store log data
         //设置随机种子
         this.random=new Math.seedrandom('2024');
     }
@@ -120,13 +122,30 @@ class ObserverRL extends RL {
     learn(s,a,r,s_,goal){
         goal=goal?1:0;
         const qPredict=this.q_table[s][this.actions.indexOf(a)][goal];
-        //9号目标
-        const qTarget=s_.split(',')[1]!=='9'?
+        //9号目标也可能是4号目标
+        const qTarget=s_.split(',')[1]!==`${`target`+goal}`?
             r + this.gamma * Math.max(...Object.values(this.q_table[s_].map(actionValues => actionValues[goal]))) :
             r;
         this.q_table[s][this.actions.indexOf(a)][goal]+=this.lr*(qTarget-qPredict)
         //console.log(s+','+a+','+this.q_table[s][this.actions.indexOf(a)]);
+        const logValue = this.q_table[s][this.actions.indexOf(a)][goal];
+        //console.log(logValue);
+        this.i++;
+        if(this.i==1000){
+            console.log(logValue);
+        }
+        // Save the result to the log array
+        this.logData.push(logValue);
+    }
+    downloadLog() {
+        const blob = new Blob([this.logData.join('\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'q_table_log.txt';
+        a.click();
+        URL.revokeObjectURL(url);
     }
 }
-export { ObserverRL };
+export {ObserverRL};
 export {QLearningTable};

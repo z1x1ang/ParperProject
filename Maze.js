@@ -67,8 +67,9 @@ step(action,agentDiv,returnValue=true){
  this.gridItems[newIndex].appendChild(agentDiv);
 
 let reward, done, oval_flag = false;
+//立即修正
  if(agentDiv==this.agent1Div) this.oval_pos=[4];
- else this.oval_pos=agent2Goal?9:4;
+ else this.oval_pos=agent2Goal?4:4;
  
  if(s_==this.oval_pos){
     reward=0;

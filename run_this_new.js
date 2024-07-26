@@ -10,7 +10,6 @@ const cost=document.getElementById('cost');
 let C=0;
 //定义去每个目标的概率
 let probability_g1,probability_g2;
-
 //定义初始动作下标
 let i=0;
 async function delay(ms) {
@@ -43,7 +42,6 @@ else if(parseFloat(probability_g1.toFixed(3))<0.5){
 else{
     document.querySelector('.q-observer').classList.remove('new-style2');
     document.querySelector('.q-observer').classList.remove('new-style');
-
 }
 //更新GUI
 document.getElementById("pg1").innerText=probability_g1;
@@ -139,6 +137,7 @@ async function update(){
     }
     //先训练agent1
     for(let episode=0;episode<120;episode++){
+        break;
         //初始化智能体1的装态
         let {observation}=env.reset()
         let c=0;
@@ -177,14 +176,21 @@ console.log("1执行完了");
 //console.log(agent1States);
     //训练智能体2
     for(let episode=0;episode<120;episode++){
+
+        let c=0;
+
         //随机初始化一个目标
         //agent2Goal=Math.floor(Math.random()*2);
         agent2Goal=0;
         //初始化智能体1的装态
         let {observation2}=env.reset() 
-        let c=0;
+     
         let tmp_policy={}
         while(true){
+            if(episode==1&&c==416){
+                console.log("dt");
+            }
+
             //2到2停止
             let action2=RL2.chooseAction(`${4},${observation2}`);
             //let action2=RL2.chooseAction(`${agent1States[c>=agent1States.length-1?agent1States.length-1:c]},${observation2}`);
@@ -213,6 +219,8 @@ console.log("1执行完了");
     console.log("120局游戏结束");
     //输出最终Q表
     let q_table_result=RL.q_table;
+
+    //RL2.downloadLog();
     //绘制相关箭头
     console.log(RL2.q_table);
     //get_policy(q_table_result);
@@ -402,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
     stepButton.addEventListener('click',function(){
         //console.log("lallalallla");
         //step(RL.q_table);
-        get_policy(RL.q_table)
+        get_policy2(RL2.q_table)
     })
     testButton.addEventListener('click',function(){
        test(RL.q_table,env.agent1Div);

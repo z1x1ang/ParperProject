@@ -137,7 +137,6 @@ async function update(){
     }
     //先训练agent1
     for(let episode=0;episode<120;episode++){
-        break;
         //初始化智能体1的装态
         let {observation}=env.reset()
         let c=0;

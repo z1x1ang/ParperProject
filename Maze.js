@@ -22,6 +22,12 @@ reset(){
    document.querySelector('.q-observer').classList.remove('new-style');
    document.querySelector('.q-observer').classList.remove('new-style2');
 
+   document.getElementById('cost*').textContent=dG1;
+   document.getElementById('cost2*').textContent=dG2;
+   document.getElementById("pg1").innerText=0.5;
+   document.getElementById("pg2").innerText=0.5;
+   document.getElementById('cost').innerHTML=0;
+
    //返回起点位置
    return {observation:agent,observation2:observer};
 }

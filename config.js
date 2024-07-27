@@ -15,3 +15,7 @@ window.agent2Goal=null;
 
 //调控get_policy2函数显示谁的策略
 window.showGoal=1;
+
+//提前定义起点与终点的最短距离
+window.dG1=7;
+window.dG2=7;

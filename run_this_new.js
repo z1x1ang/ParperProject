@@ -24,10 +24,10 @@ function getCoordinates(n) {
 //cost智能体的行动成本 minCost到真实目标g1的最优成本，minCost到真实目标g2的最优成本
 //若要修改可读性轨迹训练过的智能体，则这个代码也需修改，使其可处理不同目标~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 function updateProbability(cost,minCost,minCost2){ 
-let f2=Math.exp(-cost-minCost)*0.5/Math.exp(-8)+Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
+let f2=Math.exp(-cost-minCost)*0.5/Math.exp(-dG1)+Math.exp(-cost-minCost2)*0.5/Math.exp(-dG2);
 //计算去每个目标的概率
-probability_g1=Math.exp(-cost-minCost)*0.5/Math.exp(-8);
-probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
+probability_g1=Math.exp(-cost-minCost)*0.5/Math.exp(-dG1);
+probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-dG2);
 //console.log(probability_g1);
 //console.log(probability_g2);
 //归一化 1e-65
@@ -267,7 +267,7 @@ async function test(q_table,agentDiv){
     let action2s=[];
     let actions=[];
     //实验所用轨迹
-    let actiontest=[0,0,0,0,0,3,3]
+    let actiontest=[3,3,0,0,0,0,0]
     let i=0;
     for(let i=0;i<1;i++){
         let {observation,observation2}=env.reset();

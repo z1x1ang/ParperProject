@@ -114,13 +114,13 @@ function step(s_){
     
     //console.log(getCoordinates(s_));
     if(s_=='terminal'){
-        s_=4
+        s_=target0
         //console.log("long"+typeof(s_));
     }
-    else s_=parseInt(s_)
-    document.getElementById('cost*').textContent=getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4);
-    document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1];
-    updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
+    else s_=parseInt(s_)                                 
+    document.getElementById('cost*').textContent=Math.abs(getCoordinates(s_)[0]-getCoordinates(target0)[0])+Math.abs(getCoordinates(s_)[1]-getCoordinates(target0)[1]);
+    document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-getCoordinates(target1)[0])+Math.abs(getCoordinates(s_)[1]-getCoordinates(target1)[1]);
+    updateProbability(cost.textContent,Math.abs(getCoordinates(s_)[0]-getCoordinates(target0)[0])+Math.abs(getCoordinates(s_)[1]-getCoordinates(target0)[1]),Math.abs(getCoordinates(s_)[0]-getCoordinates(target1)[0])+Math.abs(getCoordinates(s_)[1]-getCoordinates(target1)[1]))
 }
 
 async function update(){
@@ -267,7 +267,7 @@ async function test(q_table,agentDiv){
     let action2s=[];
     let actions=[];
     //实验所用轨迹
-    let actiontest=[3,3,0,0,0,0,0]
+    let actiontest=[0,0,0,0,0,3,3]
     let i=0;
     for(let i=0;i<1;i++){
         let {observation,observation2}=env.reset();
@@ -325,7 +325,7 @@ async function test(q_table,agentDiv){
         }
         let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div);
         agent1States.push(observation)
-        if(observation!=4)observation=observation_; 
+        if(observation!=target0)observation=observation_; 
         //控制概率
         step(observation)
         isDone=done;

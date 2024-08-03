@@ -15,12 +15,12 @@ this.visited = new Array(this.gridItems.length).fill(false);
 }
 reset(){
    this.gridItems[agent].appendChild(this.agent1Div);
-   this.gridItems[observer].appendChild(this.agent2Div);
+   observer?this.gridItems[observer].appendChild(this.agent2Div):null
    //重置visited数组全为0
    this.visited.fill(false);
    //还原伪元素的标志
-   document.querySelector('.q-observer').classList.remove('new-style');
-   document.querySelector('.q-observer').classList.remove('new-style2');
+   observer?document.querySelector('.q-observer').classList.remove('new-style'):null;
+   observer?document.querySelector('.q-observer').classList.remove('new-style2'):null;
 
    document.getElementById('cost*').textContent=dG1;
    document.getElementById('cost2*').textContent=dG2;

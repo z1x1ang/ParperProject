@@ -1,5 +1,5 @@
 class RL{
-    constructor(actions,learning_rate=0.9,reward_decay=0.9,e_greedy=0.9){
+    constructor(actions,learning_rate=0.9,reward_decay=0.9,e_greedy=0.85){
         this.actions=actions;
         this.lr=learning_rate;
         this.gamma=reward_decay;
@@ -23,7 +23,7 @@ class RL{
         //this.checkStateExist(observation); // 确保状态存在
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++],始终保持较大的探索，使得agent可以学习到更完整的策略，在不同的状态下尽可能多的展示出最优策略
-        if (this.random() > this.epsilon) {
+        if (this.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);
@@ -92,7 +92,7 @@ class ObserverRL extends RL {
         //从均匀分布的[0,1)中随机采样,当小于阈值时采用选择最优行为的方式,当大于阈值选择随机行为的方式
         //return this.actionArray[this.i++]
         observation=observation.split(',')[0]=='terminal'?'4,'+observation.split(',')[1]:observation;
-        if (this.random() > this.epsilon) {
+        if (this.random() < this.epsilon) {
             // ε-greedy 策略选择动作
             try{
             const stateActionValues = this.q_table[observation].map(actionValues => actionValues[0]);

@@ -1,8 +1,8 @@
 // config.js 基本参数设置 
 //基本布局参数
 window.agent=56;
-window.observer = 57;
-window.target0 = 13;
+window.observer = null;
+window.target0 = 4;
 window.target1 = 9;
 
 //判定Q表数组采取的列数
@@ -17,5 +17,5 @@ window.agent2Goal=null;
 window.showGoal=1;
 
 //提前定义起点与终点的最短距离
-window.dG1=7;
+window.dG1=8;
 window.dG2=7;

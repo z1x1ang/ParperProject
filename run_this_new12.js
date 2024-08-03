@@ -8,7 +8,7 @@ const gridItems = document.querySelectorAll('.grid-item');
 const cost=document.getElementById('cost');
 
 //成本初始为0
-let C=0
+let C=0;
 
 //定义去每个目标的概率
 let probability_g1,probability_g2;
@@ -100,28 +100,19 @@ async function update(){
     let c=0;
     for(let episode=0;episode<120;episode++){
         //初始化装态
-        let {observation2}=env.reset()
-        let observation=observation2;
+        let {observation}=env.reset();
         //let observation=56;
-        let tmp_policy={}
+        let tmp_policy=new Map();
         while(true){          
             //基于当前状态S选择行为A
             let action=RL.chooseAction(observation)
             let state_item=observation
-            tmp_policy[state_item]=action
+            tmp_policy.set(state_item,action);
             //采取行为获得下一个状态和回报，以及是否终止
-            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent2Div)
-            // await delay(50);  // 延时50毫秒    
-            if(METHOD=="SARSA"){
-                //基于下一个状态选择行为
-                let action_=RL.chooseAction(observation_)
-                //基于变化(s,a,r,s',a')使用Sarsa进行Q更新
-                RL.learn(observation,action,reward,observation_,action_)
-            }
-            else if(METHOD=="Q-Learning"){
-                //根据当前变化更新Q
-                RL.learn(observation,action,reward,observation_,0)
-            }
+            let {s_:observation_,reward,done,oval_flag}=env.step(action,env.agent1Div)
+            //await delay(50);  // 延时50毫秒    
+            //根据当前变化更新Q
+            RL.learn(observation,action,reward,observation_,0)
             //改变状态和行为
             observation=observation_;
             c+=1;
@@ -129,6 +120,7 @@ async function update(){
             //如果为终止状态，结束当前的局数
             if(done) break;
         }
+        console.log(Array.from(tmp_policy.entries()));
     }
     env.reset();
     console.log("120局游戏结束");

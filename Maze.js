@@ -65,12 +65,12 @@ step(action,agentDiv,returnValue=true){
  }
 
  let s_ = newIndex; // 移动后的新状态
+ //移动到新位置
+ this.gridItems[newIndex].appendChild(agentDiv);
+ 
  if(!returnValue){
     return s_;
 }
-
- //移动到新位置
- this.gridItems[newIndex].appendChild(agentDiv);
 
 let reward, done, oval_flag = false;
 //立即修正

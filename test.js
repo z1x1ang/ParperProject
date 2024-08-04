@@ -1,48 +1,192 @@
-function findAllPathsDFS(grid, start, end) {
+import Maze from './Maze.js'
+
+//拿到页面设计端元素
+const gridItems = document.querySelectorAll('.grid-item');
+//获得cost元素
+const cost=document.getElementById('cost');
+//成本初始为0
+let C=0;
+//定义去每个目标的概率
+let probability_g1,probability_g2;
+//假设按这个路径走
+//let indices=[3,3,3,3,0,0,0,0,0,0,2,2];
+let indices;
+//定义总的时间步长
+let T;
+let legiable_f1;
+let legiable_f2;
+//定义初始可读性
+let legibility;
+//定义初始动作下标
+let i=0;
+
+//数值向坐标转换
+function getCoordinates(n) {
+    return [Math.floor(n / 9), n % 9];
+}
+
+//接收的是状态序列
+function checkAction(states){
+    let actions = [];
+    for (let i = 0; i < states.length - 1; i++) {
+        let current = states[i];
+        let next = states[i + 1];
+        if (next[0] === current[0] && next[1] === current[1] - 1) {
+            actions.push(2); // 左
+        } else if (next[0] === current[0] && next[1] === current[1] + 1) {
+            actions.push(3); // 右
+        } else if (next[0] === current[0] - 1 && next[1] === current[1]) {
+            actions.push(0); // 上
+        } else if (next[0] === current[0] + 1 && next[1] === current[1]) {
+            actions.push(1); // 下
+        }
+    }
+    indices=actions;
+    //定义初始变量
+    T=actions.length;
+    legiable_f1=0.5*T;
+    legiable_f2=T;
+    legibility=legiable_f1/legiable_f2;
+    return actions;
+}
+
+function updateProbability(cost,minCost,minCost2){ 
+    let f2=Math.exp(-cost-minCost)*0.5/Math.exp(-8)+Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
+    //计算去每个目标的概率
+    probability_g1=Math.exp(-cost-minCost)*0.5/Math.exp(-8);
+    probability_g2=Math.exp(-cost-minCost2)*0.5/Math.exp(-7);
+    //归一化 
+    probability_g1=probability_g1/f2;
+    probability_g2=probability_g2/f2;
+    //更新GUI
+    document.getElementById("pg1").innerText=probability_g1;
+    document.getElementById("pg2").innerText=probability_g2;
+    //计算可读性 分子
+    legiable_f1+=probability_g1*(T-cost);
+    //计算可读性分母
+    legiable_f2+=T-cost;
+    //36等于总的时间步长12+11+8+7+...+1=78
+    legibility=legiable_f1/legiable_f2;
+    //更新GUI
+    document.getElementById("legibleValue").innerText=legibility;
+    }
+
+    function step(){
+        //每步更新成本，C被初始化为0
+        cost.textContent=++C;
+        //算最优动作
+        //let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.agent1Div));
+        //移动，更新GUI
+        let s_=env.step(indices[i++],env.agent1Div,false);
+        //console.log(getCoordinates(s_));
+        document.getElementById('cost*').textContent=getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4);
+        document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1];
+        updateProbability(cost.textContent,getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4),Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1])
+    }
+
+
+// 蒙特卡洛随机生成几条路径 --种群 
+function findMonteCarloPaths(grid, start, end, maxPaths, maxLength) {
     let paths = [];
-    let path = [];
-    let found=false;
-    dfs(start,path);
+    let attempts = 0;
+    let maxAttempts = 1000;  // 最大尝试次数，以防止无限循环
+
+    while (paths.length < maxPaths && attempts < maxAttempts) {
+        let path = generateRandomPath(grid, start, end, maxLength);
+        if (path && path.length <= maxLength) {
+            paths.push(path);
+        }
+        attempts++;
+    }
     return paths;
 
-    function dfs(start, path) {
-        //console.log(start);
-        let [x,y]=start;
-        console.log(grid);
-        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] === 1) {
-            return; // 超出边界或遇到障碍
-        } 
-        path.push([x, y]); // 添加当前节点到路径中  
-        if (x === end[0] && y === end[1]) {
-            paths.push([...path]); // 找到一条路径，保存它的副本
-            found=true;
-        } else {
-            grid[x][y] = 1; // 标记为已访问
-            // 探索四个方向
-            if(!found)  dfs([x + 1, y], path);
-            if(!found)  dfs([x - 1, y], path);
-            if(!found)  dfs([x, y + 1], path);
-            if(!found)  dfs([x, y - 1], path);
-            grid[x][y] = 0; // 回溯，撤销标记
+    function generateRandomPath(grid, start, end, maxLength) {
+        let path = [];
+        let visited = new Set();  // 用于跟踪访问过的状态
+        let [x, y] = start;
+        path.push([x, y]);
+        visited.add(`${x},${y}`);  // 将起始位置添加到访问过的状态集
+        while (path.length < maxLength && !(x === end[0] && y === end[1])) {
+            let directions = [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]];
+            directions = directions.filter(dir => isValidMove(grid, dir[0], dir[1], visited));
+            if (directions.length === 0) break; // 无路可走
+            let nextMove = directions[Math.floor(Math.random() * directions.length)];
+            x = nextMove[0]; 
+            y = nextMove[1];
+            path.push([x, y]);
+            visited.add(`${x},${y}`);  // 记录新访问的状态
         }
-
-        if (!found) path.pop(); // 回溯，移除当前节点
+        if (x === end[0] && y === end[1]) {
+            return path;
+        }
+        return null;
+    }
+    function isValidMove(grid, x, y, visited) {
+        // 确保移动的位置在网格范围内，不是障碍物，且未被访问过
+        return !(x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] === 1 || visited.has(`${x},${y}`));
     }
 }
 
+
 const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
-console.table(grid);
-document.querySelectorAll('.grid-item').forEach(item=>{
-   const row = parseInt(item.dataset.row, 10);
-   const col = parseInt(item.dataset.col, 10);
-//    if(item.querySelector('.w')){
-//     grid[row][col]='w';
-//    }else if(item.querySelector('.q-hero')){
-//     grid[row][col]='q-hero';
-//    }
+const start = [6, 2];
+const end = [0, 4];
+
+
+//Calculate Fitness 计算适应度函数
+function calculate_fitness(individual){
+    //转成动作序列
+    checkAction(individual);
+    //重置某些变量
+    C=0;
+    env.reset();
+    for(let i=0;i<T;i++){   
+        step(); 
+    }
+    return legibility;
+}
+
+//Selection Operation 选择算子(轮盘赌) 
+function  roulette_wheel_selection(population, fitnesses){
+    //total_fitness=total_legibility
+    let total_fitness=fitnesses.reduce((acc,val)=>acc+val,0);
+    console.log(total_fitness);
+}
+
+// 确保DOM完全加载后再运行主函数
+document.addEventListener('DOMContentLoaded', function() {
+    // 选择按钮
+    const qlearningButton = document.querySelector('.qlearning');    
+    const stepButton=document.querySelector('.step')
+    window.env = new Maze(); 
+
+    //Initial Population 每个states里的路径是一个个体 10个个体 每个路径最长为30步
+    let population=findMonteCarloPaths(grid, start, end, 10, 30);
+
+    //indices=checkAction(states);  // 输出对应的动作集合
+
+    //迭代
+    while(true){
+        //计算种群里每个个体的适应度
+        const fitnesses = population.map(individual => calculate_fitness(individual));
+        //使用轮盘赌从旧种群里筛选"父母"
+        population = roulette_wheel_selection(population, fitnesses);
+        break;
+    }
+    //计算0号个体的适应度
+    //calculate_fitness(states)
+
+
+
+
+
+    // 为Q-Learning按钮添加点击事件监听器
+    qlearningButton.addEventListener('click', function() {
+        METHOD = "Q-Learning";
+        main(); // 调用main函数启动Q-Learning
+    });
+    stepButton.addEventListener('click',function(){
+        console.log("lallalallla");
+        step();
+    })
 });
-
- const start = [6, 2];
- const end = [0, 4];
-
- console.log(findAllPathsDFS(grid, start, end));

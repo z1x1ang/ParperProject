@@ -14,7 +14,7 @@ let C=0;
 let probability_g1,probability_g2;
 
 //假设按这个路径走
-let indices=[3,1,3,3,3,3,3,0,0,0,0,0,2,0,0,2,2,2];
+let indices=[3,3,3,3,0,0,0,0,0,0,2,2];
 
 //定义总的时间步长
 let T=indices.length;
@@ -82,15 +82,15 @@ function step(q_table){
     //每步更新成本，C被初始化为0
     cost.textContent=++C;
     //算最优动作
-    let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.newDiv));
-    let max=Math.max(...q_table[currentIndex]);
+    let currentIndex = Array.from(env.gridItems).findIndex(item => item.contains(env.agent1Div));
+    //let max=Math.max(...q_table[currentIndex]);
   
     // q_table[currentIndex].forEach((value,index)=>{
     //     if(max==value){indices.push(index);}
     // })
     // let rad=Math.floor(Math.random()*indices.length);
     //移动，更新GUI
-    let s_=env.step(indices[i++],false);
+    let s_=env.step(indices[i++],env.agent1Div,false);
     console.log(getCoordinates(s_));
     document.getElementById('cost*').textContent=getCoordinates(s_)[0]+Math.abs(getCoordinates(s_)[1]-4);
     document.getElementById('cost2*').textContent=Math.abs(getCoordinates(s_)[0]-1)+getCoordinates(s_)[1];
@@ -127,11 +127,11 @@ async function update(){
     //输出最终Q表
     let q_table_result=RL.q_table;
     //绘制相关箭头
-    console.log(q_table_result); // 打印出q_table看看是什么
-    get_policy(q_table_result);
+   //console.log(q_table_result); // 打印出q_table看看是什么
+    //get_policy(q_table_result);
     //test(q_table_result);
     //policy?console.log("最优策略已收敛:",policy):console.log("最优策略未收敛");
-    console.table(q_table_result);
+    //console.table(q_table_result);
 }
 
 function test(q_table){

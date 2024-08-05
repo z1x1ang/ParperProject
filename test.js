@@ -47,6 +47,7 @@ function checkAction(states){
     legiable_f1=0.5*T;
     legiable_f2=T;
     legibility=legiable_f1/legiable_f2;
+    i=0;
     return actions;
 }
 
@@ -132,14 +133,42 @@ const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
 const start = [6, 2];
 const end = [0, 4];
 
+//基于被选择概率从种群中选择个体
+function selectIndividualsBasedOnProbability(selectionProbabilities,population){
+    //被选择的个体
+    let selectedIndividuals=[];
+    //计算每个个体的累积概率
+    let cumulativeProbabilities=[];
+    let cumulativeSum=0;
+    for(let probability of selectionProbabilities){
+        cumulativeSum+=probability;
+        cumulativeProbabilities.push(cumulativeSum);
+    }
+    console.log("hhhhhhhhhhhhhhh");
+    console.log(cumulativeProbabilities);
+//选择
+for(let i=0;i<population.length;i++){
+    //生成一个0到1的随机数
+    let rand=Math.random();
+    
+    //找到第一个累计概率大于随机数的个体
+    for(let index=0;index<cumulativeProbabilities.length;index++){
+        if(rand<cumulativeProbabilities[index]){
+            selectedIndividuals.push(population[index]);
+            break;
+        }
+     }
+  }
+}
 
 //Calculate Fitness 计算适应度函数
-function calculate_fitness(individual){
+function calculate_fitness(individual){ 
     //转成动作序列
     checkAction(individual);
     //重置某些变量
     C=0;
     env.reset();
+    document.getElementById('legibleValue').innerHTML=legibility;
     for(let i=0;i<T;i++){   
         step(); 
     }
@@ -151,6 +180,10 @@ function  roulette_wheel_selection(population, fitnesses){
     //total_fitness=total_legibility
     let total_fitness=fitnesses.reduce((acc,val)=>acc+val,0);
     console.log(total_fitness);
+    let selection_probabilities=fitnesses.map(fitness=>fitness/total_fitness);
+    let selected_individuals=selectIndividualsBasedOnProbability(selection_probabilities,population)
+    console.log("============");
+    console.log(selection_probabilities);
 }
 
 // 确保DOM完全加载后再运行主函数
@@ -162,15 +195,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Initial Population 每个states里的路径是一个个体 10个个体 每个路径最长为30步
     let population=findMonteCarloPaths(grid, start, end, 10, 30);
-
     //indices=checkAction(states);  // 输出对应的动作集合
-
     //迭代
     while(true){
         //计算种群里每个个体的适应度
         const fitnesses = population.map(individual => calculate_fitness(individual));
+        console.log(fitnesses);
         //使用轮盘赌从旧种群里筛选"父母"
         population = roulette_wheel_selection(population, fitnesses);
+
         break;
     }
     //计算0号个体的适应度

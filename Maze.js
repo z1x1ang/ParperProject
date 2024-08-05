@@ -27,7 +27,7 @@ reset(){
    document.getElementById("pg1").innerText=0.5;
    document.getElementById("pg2").innerText=0.5;
    document.getElementById('cost').innerHTML=0;
-
+    
    //返回起点位置
    return {observation:agent,observation2:observer};
 }

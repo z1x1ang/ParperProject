@@ -144,8 +144,7 @@ function selectIndividualsBasedOnProbability(selectionProbabilities,population){
         cumulativeSum+=probability;
         cumulativeProbabilities.push(cumulativeSum);
     }
-    console.log("hhhhhhhhhhhhhhh");
-    console.log(cumulativeProbabilities);
+    //console.log(cumulativeProbabilities);
 //选择
 for(let i=0;i<population.length;i++){
     //生成一个0到1的随机数
@@ -160,6 +159,7 @@ for(let i=0;i<population.length;i++){
   }
   return selectedIndividuals;
 }
+
 //Calculate Fitness 计算适应度函数
 function calculate_fitness(individual){ 
     //转成动作序列
@@ -184,31 +184,44 @@ function  roulette_wheel_selection(population, fitnesses){
     return selected_individuals;
 }
 
-//Crossover Operation: 单点交叉
-function single_point_crossover(parent1,parent2){
-    //确定染色体长度
-    const chromosomeLength=parent1.length;
+//Crossover Operation: 单点交叉(为保证生成路径的有效性采用公共点作为交叉点的方法)
+function single_point_crossover(parent1, parent2) {
 
-    //随机选择下一个交叉点
-    const crossoverPoint=Math.floor(Math.random()*(chromosomeLength-1))+1;
+    // 确定共有的栅格点（交叉点），除去起点和终点
+    let commonPoints = parent1.slice(1, -1).filter(coord1 =>
+        parent2.some(coord2 => coord2[0] === coord1[0] && coord2[1] === coord1[1])
+    );
 
-    //生成后代：交换父代在交叉点后的基因
-    const offspring1 = parent1.slice(0, crossoverPoint) + parent2.slice(crossoverPoint);
-    const offspring2 = parent2.slice(0, crossoverPoint) + parent1.slice(crossoverPoint);
- 
+    // 如果没有共有栅格点或只有一个，直接返回父代（避免生成无效子代）
+    if (commonPoints.length < 1) {
+        return [parent1, parent2];
+    }
+
+    // 随机选择一个共有的栅格点作为交叉点
+    const crossoverPoint = commonPoints[Math.floor(Math.random() * commonPoints.length)];
+
+    // 找到交叉点在父代中的索引
+    const index1 = parent1.findIndex(coord => coord[0] === crossoverPoint[0] && coord[1] === crossoverPoint[1]);
+    const index2 = parent2.findIndex(coord => coord[0] === crossoverPoint[0] && coord[1] === crossoverPoint[1]);
+
+    // 生成后代：在共有栅格点进行交叉
+    const offspring1 = parent1.slice(0, index1 + 1).concat(parent2.slice(index2 + 1));
+    const offspring2 = parent2.slice(0, index2 + 1).concat(parent1.slice(index1 + 1));
+
+    console.log("===============");
+    console.log(parent1);
+    console.log(parent2);
+    console.log(offspring1);
+    console.log(offspring2);
+    console.log("===============");
     return [offspring1, offspring2];
 }
-/*
-# Crossover Operation: Single Point Crossover
-def single_point_crossover(parent1, parent2):
-    crossover_point = random_crossover_point()
-    offspring = exchange_genes(parent1, parent2, crossover_point)
-    return offspring
-*/
 
+//Mutation Operation 变异操作:差分进化 (突变算子)
+function mutate(individual,mutation_rate){
+    
 
-
-
+}
 // 确保DOM完全加载后再运行主函数
 document.addEventListener('DOMContentLoaded', function() {
     // 选择按钮
@@ -226,12 +239,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(fitnesses);
         //使用轮盘赌从旧种群里筛选"父母"
         population = roulette_wheel_selection(population, fitnesses);
+        console.log("筛选后的种群");
         console.log(population);
         let new_population = []
         //一次处理两个个体
         for(let i=0;i<population.length;i+=2){
            let offspring = single_point_crossover(population[i], population[i+1]);
-
+           offspring=mutate(offspring,mutation_rate)
         }
         break;
     }

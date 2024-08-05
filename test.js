@@ -150,8 +150,7 @@ function selectIndividualsBasedOnProbability(selectionProbabilities,population){
 for(let i=0;i<population.length;i++){
     //生成一个0到1的随机数
     let rand=Math.random();
-    
-    //找到第一个累计概率大于随机数的个体
+    //找到第一个累计概率大于随机数的个体，好的个体可能被多次选择
     for(let index=0;index<cumulativeProbabilities.length;index++){
         if(rand<cumulativeProbabilities[index]){
             selectedIndividuals.push(population[index]);
@@ -159,8 +158,8 @@ for(let i=0;i<population.length;i++){
         }
      }
   }
+  return selectedIndividuals;
 }
-
 //Calculate Fitness 计算适应度函数
 function calculate_fitness(individual){ 
     //转成动作序列
@@ -182,9 +181,33 @@ function  roulette_wheel_selection(population, fitnesses){
     console.log(total_fitness);
     let selection_probabilities=fitnesses.map(fitness=>fitness/total_fitness);
     let selected_individuals=selectIndividualsBasedOnProbability(selection_probabilities,population)
-    console.log("============");
-    console.log(selection_probabilities);
+    return selected_individuals;
 }
+
+//Crossover Operation: 单点交叉
+function single_point_crossover(parent1,parent2){
+    //确定染色体长度
+    const chromosomeLength=parent1.length;
+
+    //随机选择下一个交叉点
+    const crossoverPoint=Math.floor(Math.random()*(chromosomeLength-1))+1;
+
+    //生成后代：交换父代在交叉点后的基因
+    const offspring1 = parent1.slice(0, crossoverPoint) + parent2.slice(crossoverPoint);
+    const offspring2 = parent2.slice(0, crossoverPoint) + parent1.slice(crossoverPoint);
+ 
+    return [offspring1, offspring2];
+}
+/*
+# Crossover Operation: Single Point Crossover
+def single_point_crossover(parent1, parent2):
+    crossover_point = random_crossover_point()
+    offspring = exchange_genes(parent1, parent2, crossover_point)
+    return offspring
+*/
+
+
+
 
 // 确保DOM完全加载后再运行主函数
 document.addEventListener('DOMContentLoaded', function() {
@@ -203,7 +226,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(fitnesses);
         //使用轮盘赌从旧种群里筛选"父母"
         population = roulette_wheel_selection(population, fitnesses);
+        console.log(population);
+        let new_population = []
+        //一次处理两个个体
+        for(let i=0;i<population.length;i+=2){
+           let offspring = single_point_crossover(population[i], population[i+1]);
 
+        }
         break;
     }
     //计算0号个体的适应度

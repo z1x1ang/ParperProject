@@ -214,6 +214,7 @@ function single_point_crossover(parent1, parent2) {
     console.log(offspring1);
     console.log(offspring2);
     console.log("===============");
+
     return [offspring1, offspring2];
 }
 
@@ -266,3 +267,4 @@ document.addEventListener('DOMContentLoaded', function() {
         step();
     })
 });
+//paper:https://f.ws28.cn/f/ervg0e13g3c 复制链接到浏览器打开

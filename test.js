@@ -130,6 +130,7 @@ function findMonteCarloPaths(grid, start, end, maxPaths, maxLength) {
 
 
 const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+console.log(grid);
 const start = [6, 2];
 const end = [0, 4];
 
@@ -172,6 +173,18 @@ function calculate_fitness(individual){
         step(); 
     }
     return legibility;
+}
+//检查突变后的路径是否包含重复的节点
+function containsDuplicates(path) {
+    let seen = new Set();
+    for (let node of path) {
+        let key = `${node[0]},${node[1]}`;
+        if (seen.has(key)) {
+            return true; // 发现重复
+        }
+        seen.add(key);
+    }
+    return false;
 }
 
 //Selection Operation 选择算子(轮盘赌) 
@@ -219,10 +232,33 @@ function single_point_crossover(parent1, parent2) {
 }
 
 //Mutation Operation 变异操作:差分进化 (突变算子)
-function mutate(individual,mutation_rate){
-    
+function mutate(offspring, mutation_rate) {
+    return offspring.map(individual => {
+        const pathLength = individual.length;
+        const mutationLength = Math.floor(pathLength * mutation_rate);
+        const startIndex = Math.floor(Math.random() * (pathLength - mutationLength));
+        const endIndex = startIndex + mutationLength;
 
+        const start = individual[startIndex];
+        const end = individual[Math.min(endIndex, pathLength - 1)];
+
+        const mutationSegment = findMonteCarloPaths(grid, start, end, 1, mutationLength * 4);
+
+        let newPath = [
+            ...individual.slice(0, startIndex),
+            ...mutationSegment[0],
+            ...individual.slice(endIndex + 1)
+        ];
+
+        // 检查新路径中是否有重复节点
+        if (containsDuplicates(newPath)) {
+            return individual; // 如果有重复，返回原始路径
+        }
+
+        return newPath;
+    });
 }
+
 // 确保DOM完全加载后再运行主函数
 document.addEventListener('DOMContentLoaded', function() {
     // 选择按钮
@@ -242,12 +278,16 @@ document.addEventListener('DOMContentLoaded', function() {
         population = roulette_wheel_selection(population, fitnesses);
         console.log("筛选后的种群");
         console.log(population);
-        let new_population = []
+        let new_population = [];
         //一次处理两个个体
         for(let i=0;i<population.length;i+=2){
            let offspring = single_point_crossover(population[i], population[i+1]);
-           offspring=mutate(offspring,mutation_rate)
+           console.log(offspring);
+           offspring=mutate(offspring,0.2);
+           //offspring是两个数组平和而成的大数组
+           new_population.push(offspring);
         }
+        population=new_population;
         break;
     }
     //计算0号个体的适应度

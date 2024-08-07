@@ -269,15 +269,15 @@ document.addEventListener('DOMContentLoaded', function() {
     //Initial Population 每个states里的路径是一个个体 10个个体 每个路径最长为30步
     let population=findMonteCarloPaths(grid, start, end, 10, 30);
     //indices=checkAction(states);  // 输出对应的动作集合
-    //迭代
-    while(true){
+    //迭代(最大代数为)
+    for(let generation=0;generation<50;generation++){
         //计算种群里每个个体的适应度
         const fitnesses = population.map(individual => calculate_fitness(individual));
         console.log(fitnesses);
         //使用轮盘赌从旧种群里筛选"父母"
         population = roulette_wheel_selection(population, fitnesses);
-        console.log("筛选后的种群");
-        console.log(population);
+        // console.log("筛选后的种群");
+        // console.log(population);
         let new_population = [];
         //一次处理两个个体
         for(let i=0;i<population.length;i+=2){
@@ -285,18 +285,22 @@ document.addEventListener('DOMContentLoaded', function() {
            console.log(offspring);
            offspring=mutate(offspring,0.2);
            //offspring是两个数组平和而成的大数组
-           new_population.push(offspring);
+           new_population.push(offspring[0],offspring[1]);
+        //    console.log(new_population);
+        //    console.log("dsdsd");
         }
         population=new_population;
-        break;
+        // console.log(population);
+        // console.log("dsdsd");
     }
+    console.log(population);
+    //打印对应的legibility值
+    population.forEach(individual=>{
+        console.log(calculate_fitness(individual));
+    })
+
     //计算0号个体的适应度
     //calculate_fitness(states)
-
-
-
-
-
     // 为Q-Learning按钮添加点击事件监听器
     qlearningButton.addEventListener('click', function() {
         METHOD = "Q-Learning";
